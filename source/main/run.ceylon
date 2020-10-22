@@ -13,7 +13,7 @@ shared void run() {
 	// read from file
 	String[] allLines = readLines(inputFile);
 	// build output
-	String output = translate(allLines);
+	String output = translateVM(allLines);
 	// write output
 	writeFile(outputFile, output);
 	// print contents of file

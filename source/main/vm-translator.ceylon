@@ -3,16 +3,16 @@ import ceylon.regex {
 }
 
 // translate all lines of a vm program to asm
-String translate(String[] allLines) {
+String translateVM(String[] allLines) {
 	variable String output = "";
 	for (line in allLines) { 
-		output += translateLine(line);
+		output += translateLineVM(line);
 	}
 	return output;
 }
 
 // translate a line of vm to asm
-String translateLine(String line) {
+String translateLineVM(String line) {
 	if (regex("^push constant -?[0-9]+$").test(line)) {
 		// remove the push constant text and leave the number
 		String x = regex("[^0-9\\-]*").replace(line, "");
