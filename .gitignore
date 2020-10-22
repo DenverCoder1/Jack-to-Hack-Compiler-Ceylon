@@ -1,8 +1,2 @@
 /.exploded/*
 /classes/*
-/.settings/*
-/.ceylon/*
-*.bat
-ceylonb
-.project
-.classpath
