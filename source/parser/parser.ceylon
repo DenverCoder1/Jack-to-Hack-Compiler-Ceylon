@@ -7,61 +7,39 @@ import codewriter {
 import ceylon.regex {
 	regex
 }
+import ceylon.collection {
+	HashMap
+}
 
 // translate all lines of a vm program to asm
 shared String translateVM(String[] allLines) {
 	variable String output = "";
-	for (line in allLines) { 
-		output += getCommandType(line);
+	for (rawLine in allLines) { 
+		String line = stripCommentsAndWhitespace(rawLine);
+		variable String[] splitLine = [];
+		for (token in line.split(' '.equals)) {
+			splitLine = splitLine.append([token]);
+		}
+		String? commandType = getCommandType(splitLine);
+		// output += translateLine(commandType, arg1, arg2);
 	}
 	return output;
 }
 
 // translate a line of vm to asm
-String getCommandType(variable String line) {
-	line = stripCommentsAndWhitespace(line);
-	variable String[] splitLine = [];
-	for (token in line.split(' '.equals)) {
-		
+String? getCommandType(String[] splitLine) {
+	// map of commands
+	value commands = HashMap<String,String> {
+		"push"->"C_PUSH",
+		"add"->"C_ARITHMETIC"
+	};
+	// get command
+	if (splitLine.size > 0) {
+		String token = splitLine[0] else  "";
+		return commands[token];
 	}
-	try {
-		print(splitLine[0]);
-	}
-	catch (Exception e) {
-		
-	}
-	if (regex("^push constant -?[0-9]+\\W*$").test(line)) {
-		return "C_PUSH";
-	}
-	else if (regex("^\\W*add\\W*$").test(line)) {
-		return "C_ARITHMETIC";
-	}
-	else if (regex("^\\W*sub\\W*$").test(line)) {
-		return "C_ARITHMETIC";
-	}
-	else if (regex("^\\W*neg\\W*$").test(line)) {
-		return "C_ARITHMETIC";
-	}
-	else if (regex("^\\W*and\\W*$").test(line)) {
-		return "C_ARITHMETIC";
-	}
-	else if (regex("^\\W*or\\W*$").test(line)) {
-		return "C_ARITHMETIC";
-	}
-	else if (regex("^\\W*not\\W*$").test(line)) {
-		return "C_ARITHMETIC";
-	}
-	else if (regex("^\\W*eq\\W*$").test(line)) {
-		return "C_ARITHMETIC";
-	}
-	else if (regex("^\\W*gt\\W*$").test(line)) {
-		return "C_ARITHMETIC";
-	}
-	else if (regex("^\\W*lt\\W*$").test(line)) {
-		return "C_ARITHMETIC";
-	}
-	// fallthrough
-	return "";
+	
+	return null;
 }
 
 // remove single line comments
