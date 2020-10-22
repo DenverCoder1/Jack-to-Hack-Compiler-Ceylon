@@ -1,6 +1,5 @@
 /.exploded/*
 /classes/*
-/modules/*
 /.settings/*
 /.ceylon/*
 *.bat
