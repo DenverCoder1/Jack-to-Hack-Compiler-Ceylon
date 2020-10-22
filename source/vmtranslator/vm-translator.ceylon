@@ -11,8 +11,14 @@ shared String translateVM(String[] allLines) {
 	return output;
 }
 
+// remove single line comments
+String stripComments(String line) {
+	return regex("//.*").replace(line, "");
+}
+
 // translate a line of vm to asm
-String translateLineVM(String line) {
+String translateLineVM(variable String line) {
+	line = stripComments(line);
 	if (regex("^push constant -?[0-9]+$").test(line)) {
 		// remove the push constant text and leave the number
 		String x = regex("[^0-9\\-]*").replace(line, "");

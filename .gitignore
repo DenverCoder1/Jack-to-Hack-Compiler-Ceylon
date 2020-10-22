@@ -1,9 +1,9 @@
-/.exploded/
-/classes/
-/modules/
-/.settings/
+/.exploded/*
+/classes/*
+/modules/*
+/.settings/*
+/.ceylon/*
 *.bat
 ceylonb
 .project
 .classpath
-/.ceylon/
