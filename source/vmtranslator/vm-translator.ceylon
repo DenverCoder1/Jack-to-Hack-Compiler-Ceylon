@@ -3,7 +3,7 @@ import ceylon.regex {
 }
 
 // translate all lines of a vm program to asm
-String translateVM(String[] allLines) {
+shared String translateVM(String[] allLines) {
 	variable String output = "";
 	for (line in allLines) { 
 		output += translateLineVM(line);

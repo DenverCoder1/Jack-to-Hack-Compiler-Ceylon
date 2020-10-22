@@ -8,7 +8,7 @@ import ceylon.file {
 }
 
 // write text to a file
-void writeFile(String filePath, String text) {
+shared void writeFile(String filePath, String text) {
 	Resource resource = parsePath(filePath).resource;
 	// check the type of the resource
 	if (is File|Nil resource) {
@@ -23,7 +23,7 @@ void writeFile(String filePath, String text) {
 }
 
 // read a file and return a list of all lines
-String[] readLines(String filePath) {
+shared String[] readLines(String filePath) {
 	Resource resource = parsePath(filePath).resource;
 	// check the type of the resource
 	if (is File resource) {

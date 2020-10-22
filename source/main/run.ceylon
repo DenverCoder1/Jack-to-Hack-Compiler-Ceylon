@@ -1,3 +1,12 @@
+import vmtranslator {
+
+	translateVM
+}
+import files {
+
+	writeFile,
+	readLines
+}
 // Lab 1 - VM Translator
 // Jonah Lawrence
 // Daniel Klein
