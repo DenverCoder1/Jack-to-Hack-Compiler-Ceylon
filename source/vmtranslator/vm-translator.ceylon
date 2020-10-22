@@ -19,45 +19,45 @@ String stripComments(String line) {
 // translate a line of vm to asm
 String translateLineVM(variable String line) {
 	line = stripComments(line);
-	if (regex("^push constant -?[0-9]+$").test(line)) {
+	if (regex("^\\W*push constant -?[0-9]+\\W*$").test(line)) {
 		// remove the push constant text and leave the number
 		String x = regex("[^0-9\\-]*").replace(line, "");
 		// translate push constant to asm
 		return translatePushConstant(line, x);
 	}
-	else if (regex("^add$").test(line)) {
+	else if (regex("^\\W*add\\W*$").test(line)) {
 		// translate add to asm
 		return translateBinaryOperator(line, "+");
 	}
-	else if (regex("^sub$").test(line)) {
+	else if (regex("^\\W*sub\\W*$").test(line)) {
 		// translate sub to asm
 		return translateBinaryOperator(line, "-");
 	}
-	else if (regex("^neg$").test(line)) {
+	else if (regex("^\\W*neg\\W*$").test(line)) {
 		// translate neg to asm
 		return translateUnaryOperator(line, "-");
 	}
-	else if (regex("^and$").test(line)) {
+	else if (regex("^\\W*and\\W*$").test(line)) {
 		// translate and to asm
 		return translateBinaryOperator(line, "&");
 	}
-	else if (regex("^or$").test(line)) {
+	else if (regex("^\\W*or\\W*$").test(line)) {
 		// translate or to asm
 		return translateBinaryOperator(line, "|");
 	}
-	else if (regex("^not$").test(line)) {
+	else if (regex("^\\W*not\\W*$").test(line)) {
 		// translate not to asm
 		return translateUnaryOperator(line, "!");
 	}
-	else if (regex("^eq$").test(line)) {
+	else if (regex("^\\W*eq\\W*$").test(line)) {
 		// translate eq to asm
 		return translateComparator(line, "EQ");
 	}
-	else if (regex("^gt$").test(line)) {
+	else if (regex("^\\W*gt\\W*$").test(line)) {
 		// translate gt to asm
 		return translateComparator(line, "GT");
 	}
-	else if (regex("^lt$").test(line)) {
+	else if (regex("^\\W*lt\\W*$").test(line)) {
 		// translate lt to asm
 		return translateComparator(line, "LT");
 	}
