@@ -1,12 +1,54 @@
+import ceylon.collection {
+
+	HashMap
+}
 // Comment a line of vm
-String comment(String line) {
+shared String comment(String line) {
 	return "// " + line + "\n";
 }
 
+// Translate VM command to ASM
+shared String translateLine(String commandType, String arg1, String arg2) {
+	if (commandType == "C_ARITHMETIC") {
+		return translateArithmetic(arg1); 
+	}
+	else if (commandType == "C_PUSH") {
+		return translatePushConstant(arg2);
+	}
+	return "";
+}
+
+// Translate Arithmetic command
+String translateArithmetic(String arg1) {
+	// map of operators
+	value operators = HashMap<String, String> {
+		"add" -> "+",
+		"sub" -> "-",
+		"and" -> "&",
+		"or"  -> "|",
+		"not" -> "!",
+		"neg" -> "-",
+		"eq"  -> "EQ",
+		"lt"  -> "LT",
+		"gt"  -> "GT"
+	};
+	// get operator
+	String op = operators[arg1] else "";
+	if (arg1 == "add" || arg1 == "sub" || arg1 == "and" || arg1 == "or") {
+		return translateBinaryOperator(op);
+	}
+	else if (arg1 == "not" || arg1 == "neg") {
+		return translateUnaryOperator(op);
+	}
+	else if (arg1 == "eq" || arg1 == "lt" || arg1 == "gt") {
+		translateComparator(op);
+	}
+	return "";
+}
+
 // Translate Push Constant
-shared String translatePushConstant(String line, String x) {
-	return comment(line) +
-			"@" + x + "\n" + 
+String translatePushConstant(String x) {
+	return  "@" + x + "\n" + 
 			"""D=A
 			   @SP
 			   M=M+1
@@ -17,28 +59,26 @@ shared String translatePushConstant(String line, String x) {
 }
 
 // Translate Add, Sub, And, Or
-shared String translateBinaryOperator(String line, String operator) {
-	return comment(line) +
-			"""@SP
-			   AM=M-1
-			   D=M
-			   M=0
-			   @SP
-			   A=M-1
-			   """ + 
+String translateBinaryOperator(String operator) {
+	return """@SP
+	          AM=M-1
+	          D=M
+	          M=0
+	          @SP
+	          A=M-1
+	          """ + 
 			"M=D" + operator + "M" + "\n\n";
 }
 
 // Translate Not and Neg
-shared String translateUnaryOperator(String line, String operator) {
-	return comment(line) +
-			"""@SP
-			   A=M-1
-			   """ + 
+String translateUnaryOperator(String operator) {
+	return """@SP
+	          A=M-1
+	          """ + 
 			"M=" + operator + "M" + "\n\n";
 }
 
 // TODO: Translate Eq, Gt, Lt
-shared String translateComparator(String line, String operator) {
-	return comment(line) + "--\n\n";
+String translateComparator(String operator) {
+	return "// TODO -- " + operator;
 }
