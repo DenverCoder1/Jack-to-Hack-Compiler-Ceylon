@@ -7,7 +7,7 @@ import files {
 	writeFile,
 	readLines
 }
-import vmtranslator {
+import parser {
 	translateVM
 }
 

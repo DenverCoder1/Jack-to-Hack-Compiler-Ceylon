@@ -1,3 +1,9 @@
+import codewriter {
+	translateComparator,
+	translatePushConstant,
+	translateUnaryOperator,
+	translateBinaryOperator
+}
 import ceylon.regex {
 	regex
 }
@@ -9,11 +15,6 @@ shared String translateVM(String[] allLines) {
 		output += translateLineVM(line);
 	}
 	return output;
-}
-
-// remove single line comments
-String stripComments(String line) {
-	return regex("//.*").replace(line, "");
 }
 
 // translate a line of vm to asm
@@ -65,47 +66,7 @@ String translateLineVM(variable String line) {
 	return "";
 }
 
-// Comment a line of vm
-String comment(String line) {
-	return "// " + line + "\n";
-}
-
-// Translate Push Constant
-String translatePushConstant(String line, String x) {
-	return comment(line) +
-			"@" + x + "\n" + 
-			"""D=A
-			   @SP
-			   M=M+1
-			   A=M-1
-			   M=D
-			    
-			   """;
-}
-
-// Translate Add, Sub, And, Or
-String translateBinaryOperator(String line, String operator) {
-	return comment(line) +
-			"""@SP
-			   AM=M-1
-			   D=M
-			   M=0
-			   @SP
-			   A=M-1
-			   """ + 
-			"M=D" + operator + "M" + "\n\n";
-}
-
-// Translate Not and Neg
-String translateUnaryOperator(String line, String operator) {
-	return comment(line) +
-			"""@SP
-			   A=M-1
-			   """ + 
-			"M=" + operator + "M" + "\n\n";
-}
-
-// TODO: Translate Eq, Gt, Lt
-String translateComparator(String line, String operator) {
-	return comment(line) + "--\n\n";
+// remove single line comments
+String stripComments(String line) {
+	return regex("//.*").replace(line, "");
 }
