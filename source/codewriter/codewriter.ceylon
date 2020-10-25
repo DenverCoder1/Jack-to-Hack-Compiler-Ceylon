@@ -15,6 +15,35 @@ shared String translateLine(String commandType, String arg1, String arg2) {
 	else if (commandType == "C_PUSH") {
 		return translatePushConstant(arg2);
 	}
+	/*
+	else if (commandType == "C_POP") {
+	return translatePushConstant(arg2);
+	}
+	else if (commandType == "C_GOTO") {
+	return translateGoto(arg2);
+	}
+	*/
+	else if (commandType == "C_POP") {
+		return translatePushConstant(arg2);
+	}
+	else if (commandType == "C_GOTO") {
+		return translateGoto(arg2);
+	}
+	else if (commandType == "C_LABLE") {
+		return translateLable(arg2);
+	}
+	else if (commandType == "C_IF") {
+		return translateIf(arg2);
+	}
+	else if (commandType == "C_FUNCTION") {
+		return translateFunction(arg2);
+	}
+	else if (commandType == "C_CALL") {
+		return translateCall(arg2);
+	}
+	else if (commandType == "C_RETURN") {
+		return translateReturn(arg2);
+	}
 	return "";
 }
 
@@ -46,18 +75,6 @@ String translateArithmetic(String arg1) {
 	return "";
 }
 
-// Translate Push Constant
-String translatePushConstant(String x) {
-	return  "@" + x + "\n" + 
-			"""D=A
-			   @SP
-			   M=M+1
-			   A=M-1
-			   M=D
-			    
-			   """;
-}
-
 // Translate Add, Sub, And, Or
 String translateBinaryOperator(String operator) {
 	return """@SP
@@ -78,7 +95,89 @@ String translateUnaryOperator(String operator) {
 			"M=" + operator + "M" + "\n\n";
 }
 
+
+// Translate Push Constant
+String translatePushConstant(String x) {
+	return  "@" + x + "\n" + 
+			"""D=A
+			   @SP
+			   M=M+1
+			   A=M-1
+			   M=D
+			    
+			   """;
+}
+
 // TODO: Translate Eq, Gt, Lt
 String translateComparator(String operator) {
-	return "// TODO -- " + operator;
+	//looking for more consice version
+	
+	return """@SP
+	          AM=M-1
+	          D=M
+	          M=0
+	          @SP
+	          A=M-1
+	          D=M-D
+	          @true_lable
+	          D;J""" +
+			operator +
+			"""/n
+			   @false_lable
+			   0;JMP
+			   @SP
+			   A=M-1
+			   M=-1
+			   @continue_lable
+			   0;JMP
+			   false_lable
+			   @SP
+			   A=M-1
+			   M=0
+			   @continue_lable
+			   0;JMP
+			   continue_lable
+	          """ + "\n\n";
+}
+
+
+
+// Translate push comands
+String translatePush(String temp){
+	return "";
+}
+
+// Translate pop comands
+String translatePop(String temp){
+	return "";
+}
+
+// Translate goto commands
+String translateGoto(String temp){
+	return "";
+}
+
+// Translate lable commands
+String translateLable(String temp){
+	return "";
+}
+
+// Translate if commands
+String translateIf(String temp){
+	return "";
+}
+
+// Translate fucntion commands
+String translateFunction(String temp){
+	return "";
+}
+
+// Translate call commands
+String translateCall(String temp){
+	return "";
+}
+
+// Translate return commands
+String translateReturn(String temp){
+	return "";
 }
