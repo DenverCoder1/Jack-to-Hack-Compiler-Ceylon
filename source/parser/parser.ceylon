@@ -69,7 +69,7 @@ String? getCommandType(String[] splitLine) {
 
 // get first argument
 String? getFirstArg(String[] splitLine, String commandType) {
-	if (commandType == "C_ARITHMETIC") {
+	if (commandType in ["C_ARITHMETIC","C_PUSH", "C_POP", "C_GOTO", "C_IF",  "C_LABLE", "C_FUNCTION", "C_CALL"]) {
 		return splitLine[0];
 	}
 	else {
@@ -79,7 +79,7 @@ String? getFirstArg(String[] splitLine, String commandType) {
 
 // get second argument
 String? getSecondArg(String[] splitLine, String commandType) {
-	if (commandType in ["C_PUSH", "C_POP", "C_CALL", "C_FUNCTION"]) {
+	if (commandType in ["C_PUSH", "C_POP", "C_FUNCTION"]) {
 		String num = splitLine[2] else "0";
 		return regex("[^0-9\\-]").replace(num, "");
 	}

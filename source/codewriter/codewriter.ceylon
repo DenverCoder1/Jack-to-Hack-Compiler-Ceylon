@@ -8,41 +8,41 @@ shared String comment(String line) {
 }
 
 // Translate VM command to ASM
-shared String translateLine(String commandType, String arg1, String arg2) {
+shared String translateLine(String commandType, String arg1, String arg2, String file) {
 	if (commandType == "C_ARITHMETIC") {
 		return translateArithmetic(arg1); 
 	}
 	else if (commandType == "C_PUSH") {
 		return translatePushConstant(arg2);
 	}
-	/*
-	else if (commandType == "C_POP") {
-	return translatePushConstant(arg2);
-	}
-	else if (commandType == "C_GOTO") {
-	return translateGoto(arg2);
-	}
-	*/
 	else if (commandType == "C_POP") {
 		return translatePushConstant(arg2);
 	}
+	/*
+	else if (commandType == "C_POP") {
+	return translatePush(arg1, arg2, file);
+	}
 	else if (commandType == "C_GOTO") {
-		return translateGoto(arg2);
+	return translatePop(arg1, arg2, file);
+	}
+	*/	
+	else if (commandType == "C_GOTO") {
+		return translateGoto(arg1);
 	}
 	else if (commandType == "C_LABLE") {
-		return translateLable(arg2);
+		return translateLable(arg1);
 	}
 	else if (commandType == "C_IF") {
-		return translateIf(arg2);
+		return translateIf(arg1);
 	}
 	else if (commandType == "C_FUNCTION") {
-		return translateFunction(arg2);
+		return translateFunction(arg1, arg2);
 	}
 	else if (commandType == "C_CALL") {
-		return translateCall(arg2);
+		return translateCall(arg1, arg2);
 	}
 	else if (commandType == "C_RETURN") {
-		return translateReturn(arg2);
+		return translateReturn();
 	}
 	return "";
 }
@@ -143,41 +143,86 @@ String translateComparator(String operator) {
 
 
 // Translate push comands
-String translatePush(String temp){
+String translatePush(String segment, String index, String file){
+	if (segment == "CONSTANT") {
+		 
+	}
+	else if (segment in ["LOCAL", "ARGUMENT", "THIS", "THAT"]) {
+		if (segment == "LOCAL") {
+			
+		}
+		else if (segment == "ARGUMENT") {
+			
+		}
+		else if (segment == "THIS") {
+			
+		}
+		else if (segment == "THAT") {
+			
+		}
+	}
+	else if (segment == "STATIC") {
+		
+	}
 	return "";
 }
 
 // Translate pop comands
-String translatePop(String temp){
+String translatePop (String segment, String index, String file){
+	//no pop constant
+	if (segment == "LOCAL") {
+		
+	}
+	else if (segment in ["LOCAL", "ARGUMENT", "THIS", "THAT"]) {
+		if (segment == "LOCAL") {
+			
+		}
+		else if (segment == "ARGUMENT") {
+			
+		}
+		else if (segment == "THIS") {
+			
+		}
+		else if (segment == "THAT") {
+			
+		}
+	}
+	else if (segment == "STATIC") {
+		
+	}
 	return "";
 }
 
 // Translate goto commands
-String translateGoto(String temp){
+String translateGoto(String lable){
 	return "";
 }
 
 // Translate lable commands
-String translateLable(String temp){
+String translateLable(String lable){
 	return "";
 }
 
 // Translate if commands
-String translateIf(String temp){
+String translateIf(String lable){
 	return "";
 }
 
 // Translate fucntion commands
-String translateFunction(String temp){
+String translateFunction(String functionName, String numVars){
 	return "";
 }
 
 // Translate call commands
-String translateCall(String temp){
+String translateCall(String functionName, String numArgs){
 	return "";
 }
 
 // Translate return commands
-String translateReturn(String temp){
+String translateReturn(){
 	return "";
 }
+
+
+
+
