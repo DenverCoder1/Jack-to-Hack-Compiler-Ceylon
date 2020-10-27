@@ -1,3 +1,8 @@
+@256
+D=A
+@SP
+M=D
+
 // push constant 17
 @17
 D=A
@@ -26,18 +31,19 @@ D=M-D
 D;JEQ
 @false_1
 0;JMP
+(true_1)
 @SP
 A=M-1
 M=-1
 @continue_1
 0;JMP
-false_1
+(false_1)
 @SP
 A=M-1
 M=0
 @continue_1
 0;JMP
-continue_1
+(continue_1)
 
 // push constant 17
 @17
@@ -67,18 +73,19 @@ D=M-D
 D;JEQ
 @false_2
 0;JMP
+(true_2)
 @SP
 A=M-1
 M=-1
 @continue_2
 0;JMP
-false_2
+(false_2)
 @SP
 A=M-1
 M=0
 @continue_2
 0;JMP
-continue_2
+(continue_2)
 
 // push constant 16
 @16
@@ -108,18 +115,19 @@ D=M-D
 D;JEQ
 @false_3
 0;JMP
+(true_3)
 @SP
 A=M-1
 M=-1
 @continue_3
 0;JMP
-false_3
+(false_3)
 @SP
 A=M-1
 M=0
 @continue_3
 0;JMP
-continue_3
+(continue_3)
 
 // push constant 892
 @892
@@ -149,18 +157,19 @@ D=M-D
 D;JLT
 @false_4
 0;JMP
+(true_4)
 @SP
 A=M-1
 M=-1
 @continue_4
 0;JMP
-false_4
+(false_4)
 @SP
 A=M-1
 M=0
 @continue_4
 0;JMP
-continue_4
+(continue_4)
 
 // push constant 891
 @891
@@ -190,18 +199,19 @@ D=M-D
 D;JLT
 @false_5
 0;JMP
+(true_5)
 @SP
 A=M-1
 M=-1
 @continue_5
 0;JMP
-false_5
+(false_5)
 @SP
 A=M-1
 M=0
 @continue_5
 0;JMP
-continue_5
+(continue_5)
 
 // push constant 891
 @891
@@ -231,18 +241,19 @@ D=M-D
 D;JLT
 @false_6
 0;JMP
+(true_6)
 @SP
 A=M-1
 M=-1
 @continue_6
 0;JMP
-false_6
+(false_6)
 @SP
 A=M-1
 M=0
 @continue_6
 0;JMP
-continue_6
+(continue_6)
 
 // push constant 32767
 @32767
@@ -272,18 +283,19 @@ D=M-D
 D;JGT
 @false_7
 0;JMP
+(true_7)
 @SP
 A=M-1
 M=-1
 @continue_7
 0;JMP
-false_7
+(false_7)
 @SP
 A=M-1
 M=0
 @continue_7
 0;JMP
-continue_7
+(continue_7)
 
 // push constant 32766
 @32766
@@ -313,18 +325,19 @@ D=M-D
 D;JGT
 @false_8
 0;JMP
+(true_8)
 @SP
 A=M-1
 M=-1
 @continue_8
 0;JMP
-false_8
+(false_8)
 @SP
 A=M-1
 M=0
 @continue_8
 0;JMP
-continue_8
+(continue_8)
 
 // push constant 32766
 @32766
@@ -354,18 +367,19 @@ D=M-D
 D;JGT
 @false_9
 0;JMP
+(true_9)
 @SP
 A=M-1
 M=-1
 @continue_9
 0;JMP
-false_9
+(false_9)
 @SP
 A=M-1
 M=0
 @continue_9
 0;JMP
-continue_9
+(continue_9)
 
 // push constant 57
 @57
@@ -398,7 +412,7 @@ D=M
 M=0
 @SP
 A=M-1
-M=D+M
+M=M+D
 
 // push constant 112
 @112
@@ -415,7 +429,7 @@ D=M
 M=0
 @SP
 A=M-1
-M=D-M
+M=M-D
 
 // neg
 @SP
@@ -429,7 +443,7 @@ D=M
 M=0
 @SP
 A=M-1
-M=D&M
+M=M&D
 
 // push constant 82
 @82
@@ -446,7 +460,7 @@ D=M
 M=0
 @SP
 A=M-1
-M=D|M
+M=M|D
 
 // not
 @SP

@@ -41,6 +41,15 @@ shared String translateLine(String commandType, String arg1, String arg2, String
 	return "";
 }
 
+shared String initializeStack() {
+	return """@256
+	          D=A
+	          @SP
+	          M=D
+	          
+	          """;
+}
+
 // Translate Arithmetic command
 String translateArithmetic(String arg1) {
 	// map of operators
@@ -78,7 +87,7 @@ String translateBinaryOperator(String operator) {
 	          @SP
 	          A=M-1
 	          """ + 
-			"M=D" + operator + "M" + "\n\n";
+			"M=M" + operator + "D" + "\n\n";
 }
 
 // Translate Not and Neg
@@ -117,19 +126,20 @@ String translateComparator(String operator) {
 	          "D;J" +
 			operator + "\n" +
 			"@false_" + labelNumber.string + "\n" +
-			"""0;JMP
-			   @SP
+			"0;JMP" + "\n" +
+			"(true_" + labelNumber.string + ")\n" +
+			"""@SP
 			   A=M-1
 			   M=-1
 			   @continue_""" + labelNumber.string + "\n" +
 			"""0;JMP
-			   false_""" + labelNumber.string + "\n" +
+			   (false_""" + labelNumber.string + ")\n" +
 			"""@SP
 			   A=M-1
 			   M=0
 			   @continue_""" + labelNumber.string + "\n" +
 			"""0;JMP
-			   continue_""" + labelNumber.string + "\n\n";
+			   (continue_""" + labelNumber.string + ")\n\n";
 }
 
 

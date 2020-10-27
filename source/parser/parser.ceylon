@@ -1,6 +1,7 @@
 import codewriter {
 	comment,
-	translateLine
+	translateLine,
+	initializeStack
 }
 import ceylon.regex {
 	regex
@@ -16,6 +17,7 @@ import files {
 shared String translateVM(String inputFile) {
 	String[] allLines = readLines(inputFile);
 	variable String output = "";
+	output += initializeStack();
 	for (rawLine in allLines) { 
 		// strip comments and whitespace
 		String line = stripCommentsAndWhitespace(rawLine);
