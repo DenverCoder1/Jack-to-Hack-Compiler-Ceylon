@@ -8,24 +8,16 @@ shared String comment(String line) {
 }
 
 // Translate VM command to ASM
-shared String translateLine(String commandType, String arg1, String arg2, String file) {
+shared String translateLine(String commandType, String arg1, String arg2, String inputFile) {
 	if (commandType == "C_ARITHMETIC") {
 		return translateArithmetic(arg1); 
 	}
 	else if (commandType == "C_PUSH") {
-		return translatePushConstant(arg2);
+		return translatePush(arg1, arg2, inputFile);
 	}
 	else if (commandType == "C_POP") {
-		return translatePushConstant(arg2);
-	}
-	/*
-	else if (commandType == "C_POP") {
-	return translatePush(arg1, arg2, file);
-	}
-	else if (commandType == "C_GOTO") {
-	return translatePop(arg1, arg2, file);
-	}
-	*/	
+		return translatePop(arg1, arg2, inputFile);
+	}	
 	else if (commandType == "C_GOTO") {
 		return translateGoto(arg1);
 	}
@@ -108,7 +100,7 @@ String translatePushConstant(String x) {
 			   """;
 }
 
-// TODO: Translate Eq, Gt, Lt
+// Translate Eq, Gt, Lt
 String translateComparator(String operator) {
 	//looking for more consice version
 	
@@ -121,9 +113,8 @@ String translateComparator(String operator) {
 	          D=M-D
 	          @true_lable
 	          D;J""" +
-			operator +
-			"""/n
-			   @false_lable
+			operator + "\n" +
+			"""@false_lable
 			   0;JMP
 			   @SP
 			   A=M-1
@@ -143,54 +134,66 @@ String translateComparator(String operator) {
 
 
 // Translate push comands
-String translatePush(String segment, String index, String file){
-	if (segment == "CONSTANT") {
-		 
+String translatePush(String arg1, String arg2, String inputFile) {
+	if (arg1 == "constant") {
+		 return translatePushConstant(arg2);
 	}
-	else if (segment in ["LOCAL", "ARGUMENT", "THIS", "THAT"]) {
-		if (segment == "LOCAL") {
-			
+	else if (arg1 in ["local", "argument", "this", "that"]) {
+		// local
+		if (arg1 == "local") {
+			return ""; // TODO
 		}
-		else if (segment == "ARGUMENT") {
-			
+		// argument
+		else if (arg1 == "argument") {
+			return ""; // TODO
 		}
-		else if (segment == "THIS") {
-			
+		// this
+		else if (arg1 == "this") {
+			return ""; // TODO
 		}
-		else if (segment == "THAT") {
-			
+		// that
+		else {
+			return ""; // TODO
 		}
 	}
-	else if (segment == "STATIC") {
-		
+	// static
+	else if (arg1 == "static") {
+		return ""; // TODO
 	}
-	return "";
+	// other
+	else {
+		throw Exception("Illegal push argument");
+	}
 }
 
 // Translate pop comands
-String translatePop (String segment, String index, String file){
-	//no pop constant
-	if (segment == "LOCAL") {
-		
+String translatePop (String arg1, String arg2, String inputFile) {
+	if (arg1 in ["local", "argument", "this", "that"]) {
+		// local
+		if (arg1 == "local") {
+			return ""; // TODO
+		}
+		// argument
+		else if (arg1 == "argument") {
+			return ""; // TODO
+		}
+		// this
+		else if (arg1 == "this") {
+			return ""; // TODO
+		}
+		// that
+		else {
+			return ""; // TODO
+		}
 	}
-	else if (segment in ["LOCAL", "ARGUMENT", "THIS", "THAT"]) {
-		if (segment == "LOCAL") {
-			
-		}
-		else if (segment == "ARGUMENT") {
-			
-		}
-		else if (segment == "THIS") {
-			
-		}
-		else if (segment == "THAT") {
-			
-		}
+	// static
+	else if (arg1 == "static") {
+		return ""; // TODO
 	}
-	else if (segment == "STATIC") {
-		
+	// other
+	else {
+		throw Exception("Illegal pop argument");
 	}
-	return "";
 }
 
 // Translate goto commands

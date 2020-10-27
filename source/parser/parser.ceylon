@@ -8,9 +8,13 @@ import ceylon.regex {
 import ceylon.collection {
 	HashMap
 }
+import files {
+	readLines
+}
 
 // translate all lines of a vm program to asm
-shared String translateVM(String[] allLines) {
+shared String translateVM(String inputFile) {
+	String[] allLines = readLines(inputFile);
 	variable String output = "";
 	for (rawLine in allLines) { 
 		// strip comments and whitespace
@@ -31,7 +35,7 @@ shared String translateVM(String[] allLines) {
 		// add original line as comment to output
 		output += comment(rawLine);
 		// add translation of command to output 
-		output += translateLine(commandType, arg1, arg2);
+		output += translateLine(commandType, arg1, arg2, inputFile);
 	}
 	return output;
 }
@@ -69,19 +73,25 @@ String? getCommandType(String[] splitLine) {
 
 // get first argument
 String? getFirstArg(String[] splitLine, String commandType) {
-	if (commandType in ["C_ARITHMETIC","C_PUSH", "C_POP", "C_GOTO", "C_IF",  "C_LABLE", "C_FUNCTION", "C_CALL"]) {
+	if (commandType == "C_RETURN") {
+		return null;
+	}
+	if (commandType == "C_ARITHMETIC") {
 		return splitLine[0];
 	}
-	else {
-		return null;
+	try {
+		return splitLine[1];
+	}
+	catch (Exception e) {
+		throw Exception("Invalid VM Command");
 	}
 }
 
 // get second argument
 String? getSecondArg(String[] splitLine, String commandType) {
 	if (commandType in ["C_PUSH", "C_POP", "C_FUNCTION"]) {
-		String num = splitLine[2] else "0";
-		return regex("[^0-9\\-]").replace(num, "");
+		String arg2 = splitLine[2] else "0";
+		return regex("[^0-9\\-]").replace(arg2, "");
 	}
 	else {
 		return null;
