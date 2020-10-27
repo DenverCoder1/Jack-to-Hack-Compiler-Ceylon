@@ -141,19 +141,19 @@ String translatePush(String arg1, String arg2, String inputFile) {
 	else if (arg1 in ["local", "argument", "this", "that"]) {
 		// local
 		if (arg1 == "local") {
-			return ""; // TODO
+			return pushStackSegment("LCL",arg2);
 		}
 		// argument
 		else if (arg1 == "argument") {
-			return ""; // TODO
+			return pushStackSegment("ARG",arg2);
 		}
 		// this
 		else if (arg1 == "this") {
-			return ""; // TODO
+			return pushStackSegment("THIS",arg2);
 		}
 		// that
 		else {
-			return ""; // TODO
+			return pushStackSegment("THAT",arg2);
 		}
 	}
 	// static
@@ -171,19 +171,19 @@ String translatePop (String arg1, String arg2, String inputFile) {
 	if (arg1 in ["local", "argument", "this", "that"]) {
 		// local
 		if (arg1 == "local") {
-			return ""; // TODO
+			return popStackSegment("LCL",arg2);
 		}
 		// argument
 		else if (arg1 == "argument") {
-			return ""; // TODO
+			return popStackSegment("ARG",arg2);
 		}
 		// this
 		else if (arg1 == "this") {
-			return ""; // TODO
+			return popStackSegment("THIS",arg2);
 		}
 		// that
 		else {
-			return ""; // TODO
+			return popStackSegment("THAT",arg2);
 		}
 	}
 	// static
@@ -226,6 +226,71 @@ String translateReturn(){
 	return "";
 }
 
+//push local/argument/this/that to the stack
+String pushStackSegment(String type, String arg2){
+	return """@""" + 
+			arg2 + 
+			"\n" +
+			"""D=A
+			   @""" +
+			type + 
+			"\n" +
+			"""A=M+D
+			   D=M
+			   @SP
+			   M=M+A
+			   A=M-1
+			   M=D""" + "\n\n";
+	
+	
+	
+}
 
+// pop local/argument/this/that to be stored in R13
+String popStackSegment(String type, String arg2){
+	return """@""" + 
+			arg2 + 
+			"\n" +
+			"""D=A
+			   @""" + 
+			type + 
+			"\n" +
+			"""D=D+M
+			   @R13
+			   M=D
+			   @SP
+			   AM=M-1
+			   D=M
+			   M=0
+			   @R13
+			   A=M
+			   M=D""" + "\n\n";
+			  
+	
+}
 
+String pushStackStatic(String arg2, String inputFile){
+	return  "@" +
+			inputFile  +
+			"." +
+			arg2 +
+			"\n" +
+			"D=M" +
+			"""@SP
+	           M=M+1
+	           A=M-1
+	           M=D""";
+}
 
+String popStackStatic(String arg2, String inputFile){
+	return """@SP
+	          AM=M-1
+	          D=M
+	          M=0""" +
+			"@" +
+			inputFile  +
+			"." +
+			arg2 +
+			"\n" +
+			"D=M";	
+}
