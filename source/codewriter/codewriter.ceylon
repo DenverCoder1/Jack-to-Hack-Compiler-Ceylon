@@ -62,7 +62,7 @@ String translateArithmetic(String arg1) {
 		return translateUnaryOperator(op);
 	}
 	else if (arg1 == "eq" || arg1 == "lt" || arg1 == "gt") {
-		translateComparator(op);
+		return translateComparator(op);
 	}
 	return "";
 }
