@@ -1,7 +1,9 @@
 import ceylon.collection {
-
 	HashMap
 }
+
+shared variable Integer labelNumber = 0;
+
 // Comment a line of vm
 shared String comment(String line) {
 	return "// " + line + "\n";
@@ -103,7 +105,7 @@ String translatePushConstant(String x) {
 // Translate Eq, Gt, Lt
 String translateComparator(String operator) {
 	//looking for more consice version
-	
+	labelNumber += 1;
 	return """@SP
 	          AM=M-1
 	          D=M
@@ -111,24 +113,23 @@ String translateComparator(String operator) {
 	          @SP
 	          A=M-1
 	          D=M-D
-	          @true_label
-	          D;J""" +
+	          @true_""" + labelNumber.string + "\n" +
+	          "D;J" +
 			operator + "\n" +
-			"""@false_label
-			   0;JMP
+			"@false_" + labelNumber.string + "\n" +
+			"""0;JMP
 			   @SP
 			   A=M-1
 			   M=-1
-			   @continue_label
-			   0;JMP
-			   false_label
-			   @SP
+			   @continue_""" + labelNumber.string + "\n" +
+			"""0;JMP
+			   false_""" + labelNumber.string + "\n" +
+			"""@SP
 			   A=M-1
 			   M=0
-			   @continue_label
-			   0;JMP
-			   continue_label
-	          """ + "\n\n";
+			   @continue_""" + labelNumber.string + "\n" +
+			"""0;JMP
+			   continue_""" + labelNumber.string + "\n\n";
 }
 
 
