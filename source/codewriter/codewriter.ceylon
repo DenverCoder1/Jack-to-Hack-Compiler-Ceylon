@@ -21,8 +21,8 @@ shared String translateLine(String commandType, String arg1, String arg2, String
 	else if (commandType == "C_GOTO") {
 		return translateGoto(arg1);
 	}
-	else if (commandType == "C_LABLE") {
-		return translateLable(arg1);
+	else if (commandType == "C_LABEL") {
+		return translateLabel(arg1);
 	}
 	else if (commandType == "C_IF") {
 		return translateIf(arg1);
@@ -111,23 +111,23 @@ String translateComparator(String operator) {
 	          @SP
 	          A=M-1
 	          D=M-D
-	          @true_lable
+	          @true_label
 	          D;J""" +
 			operator + "\n" +
-			"""@false_lable
+			"""@false_label
 			   0;JMP
 			   @SP
 			   A=M-1
 			   M=-1
-			   @continue_lable
+			   @continue_label
 			   0;JMP
-			   false_lable
+			   false_label
 			   @SP
 			   A=M-1
 			   M=0
-			   @continue_lable
+			   @continue_label
 			   0;JMP
-			   continue_lable
+			   continue_label
 	          """ + "\n\n";
 }
 
@@ -197,33 +197,33 @@ String translatePop (String arg1, String arg2, String inputFile) {
 }
 
 // Translate goto commands
-String translateGoto(String lable){
-	return "";
+String translateGoto(String label){
+	return "";  // TODO
 }
 
-// Translate lable commands
-String translateLable(String lable){
-	return "";
+// Translate label commands
+String translateLabel(String label){
+	return ""; // TODO
 }
 
 // Translate if commands
-String translateIf(String lable){
-	return "";
+String translateIf(String label){
+	return ""; // TODO
 }
 
 // Translate fucntion commands
 String translateFunction(String functionName, String numVars){
-	return "";
+	return ""; // TODO
 }
 
 // Translate call commands
 String translateCall(String functionName, String numArgs){
-	return "";
+	return ""; // TODO
 }
 
 // Translate return commands
 String translateReturn(){
-	return "";
+	return ""; // TODO
 }
 
 
