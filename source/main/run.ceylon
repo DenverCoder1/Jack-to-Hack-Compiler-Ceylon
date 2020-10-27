@@ -4,8 +4,7 @@
 
 // import from local modules
 import files {
-	writeFile,
-	readLines
+	writeFile
 }
 import parser {
 	translateVM
@@ -19,10 +18,8 @@ shared void run() {
 	String dir = "./resource/"+stage+"/"+test+"/";
 	String inputFile = dir+test+".vm";
 	String outputFile = dir+test+".asm";
-	// read from file
-	String[] allLines = readLines(inputFile);
 	// build output
-	String output = translateVM(allLines);
+	String output = translateVM(inputFile);
 	// write output
 	writeFile(outputFile, output);
 	// print contents of file

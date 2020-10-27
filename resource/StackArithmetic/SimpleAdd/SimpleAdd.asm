@@ -1,4 +1,4 @@
-// push constant 7
+// PUSH CONSTANT 7
 @7
 D=A
 @SP

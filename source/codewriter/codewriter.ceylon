@@ -8,41 +8,33 @@ shared String comment(String line) {
 }
 
 // Translate VM command to ASM
-shared String translateLine(String commandType, String arg1, String arg2) {
+shared String translateLine(String commandType, String arg1, String arg2, String inputFile) {
 	if (commandType == "C_ARITHMETIC") {
 		return translateArithmetic(arg1); 
 	}
 	else if (commandType == "C_PUSH") {
-		return translatePushConstant(arg2);
+		return translatePush(arg1, arg2, inputFile);
 	}
-	/*
 	else if (commandType == "C_POP") {
-	return translatePushConstant(arg2);
-	}
+		return translatePop(arg1, arg2, inputFile);
+	}	
 	else if (commandType == "C_GOTO") {
-	return translateGoto(arg2);
-	}
-	*/
-	else if (commandType == "C_POP") {
-		return translatePushConstant(arg2);
-	}
-	else if (commandType == "C_GOTO") {
-		return translateGoto(arg2);
+		return translateGoto(arg1);
 	}
 	else if (commandType == "C_LABLE") {
-		return translateLable(arg2);
+		return translateLable(arg1);
 	}
 	else if (commandType == "C_IF") {
-		return translateIf(arg2);
+		return translateIf(arg1);
 	}
 	else if (commandType == "C_FUNCTION") {
-		return translateFunction(arg2);
+		return translateFunction(arg1, arg2);
 	}
 	else if (commandType == "C_CALL") {
-		return translateCall(arg2);
+		return translateCall(arg1, arg2);
 	}
 	else if (commandType == "C_RETURN") {
-		return translateReturn(arg2);
+		return translateReturn();
 	}
 	return "";
 }
@@ -108,7 +100,7 @@ String translatePushConstant(String x) {
 			   """;
 }
 
-// TODO: Translate Eq, Gt, Lt
+// Translate Eq, Gt, Lt
 String translateComparator(String operator) {
 	//looking for more consice version
 	
@@ -121,9 +113,8 @@ String translateComparator(String operator) {
 	          D=M-D
 	          @true_lable
 	          D;J""" +
-			operator +
-			"""/n
-			   @false_lable
+			operator + "\n" +
+			"""@false_lable
 			   0;JMP
 			   @SP
 			   A=M-1
@@ -143,41 +134,98 @@ String translateComparator(String operator) {
 
 
 // Translate push comands
-String translatePush(String temp){
-	return "";
+String translatePush(String arg1, String arg2, String inputFile) {
+	if (arg1 == "constant") {
+		 return translatePushConstant(arg2);
+	}
+	else if (arg1 in ["local", "argument", "this", "that"]) {
+		// local
+		if (arg1 == "local") {
+			return ""; // TODO
+		}
+		// argument
+		else if (arg1 == "argument") {
+			return ""; // TODO
+		}
+		// this
+		else if (arg1 == "this") {
+			return ""; // TODO
+		}
+		// that
+		else {
+			return ""; // TODO
+		}
+	}
+	// static
+	else if (arg1 == "static") {
+		return ""; // TODO
+	}
+	// other
+	else {
+		throw Exception("Illegal push argument");
+	}
 }
 
 // Translate pop comands
-String translatePop(String temp){
-	return "";
+String translatePop (String arg1, String arg2, String inputFile) {
+	if (arg1 in ["local", "argument", "this", "that"]) {
+		// local
+		if (arg1 == "local") {
+			return ""; // TODO
+		}
+		// argument
+		else if (arg1 == "argument") {
+			return ""; // TODO
+		}
+		// this
+		else if (arg1 == "this") {
+			return ""; // TODO
+		}
+		// that
+		else {
+			return ""; // TODO
+		}
+	}
+	// static
+	else if (arg1 == "static") {
+		return ""; // TODO
+	}
+	// other
+	else {
+		throw Exception("Illegal pop argument");
+	}
 }
 
 // Translate goto commands
-String translateGoto(String temp){
+String translateGoto(String lable){
 	return "";
 }
 
 // Translate lable commands
-String translateLable(String temp){
+String translateLable(String lable){
 	return "";
 }
 
 // Translate if commands
-String translateIf(String temp){
+String translateIf(String lable){
 	return "";
 }
 
 // Translate fucntion commands
-String translateFunction(String temp){
+String translateFunction(String functionName, String numVars){
 	return "";
 }
 
 // Translate call commands
-String translateCall(String temp){
+String translateCall(String functionName, String numArgs){
 	return "";
 }
 
 // Translate return commands
-String translateReturn(String temp){
+String translateReturn(){
 	return "";
 }
+
+
+
+
