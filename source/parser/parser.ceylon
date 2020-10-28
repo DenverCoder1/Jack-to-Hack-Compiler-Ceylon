@@ -1,7 +1,7 @@
 import codewriter {
 	comment,
 	translateLine,
-	initializeStack
+	initializeConstants
 }
 import ceylon.regex {
 	regex
@@ -14,10 +14,10 @@ import files {
 }
 
 // translate all lines of a vm program to asm
-shared String translateVM(String inputFile) {
-	String[] allLines = readLines(inputFile);
+shared String translateVM(String path, String filename) {
+	String[] allLines = readLines(path+filename+".vm");
 	variable String output = "";
-	output += initializeStack();
+	output += initializeConstants();
 	for (rawLine in allLines) { 
 		// strip comments and whitespace
 		String line = stripCommentsAndWhitespace(rawLine);
@@ -37,7 +37,7 @@ shared String translateVM(String inputFile) {
 		// add original line as comment to output
 		output += comment(rawLine);
 		// add translation of command to output 
-		output += translateLine(commandType, arg1, arg2, inputFile);
+		output += translateLine(commandType, arg1, arg2, filename);
 	}
 	return output;
 }

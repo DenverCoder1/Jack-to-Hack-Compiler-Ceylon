@@ -41,10 +41,35 @@ shared String translateLine(String commandType, String arg1, String arg2, String
 	return "";
 }
 
-shared String initializeStack() {
-	return """@256
+shared String initializeConstants() {
+	return """// set sp 256
+	          @256
 	          D=A
 	          @SP
+	          M=D
+	          
+	          // set local 300
+	          @300
+	          D=A
+	          @LCL
+	          M=D
+	          
+	          // set argument 400
+	          @400
+	          D=A
+	          @ARG
+	          M=D
+	          
+	          // set this 3000
+	          @3000
+	          D=A
+	          @THIS
+	          M=D
+	          
+	          // set that 3010
+	          @3010
+	          D=A
+	          @THAT
 	          M=D
 	          
 	          """;
@@ -281,7 +306,7 @@ String pushSegment(String type, String arg2) {
 			"""A=M+D
 			   D=M
 			   @SP
-			   M=M+A
+			   M=M+1
 			   A=M-1
 			   M=D
 			   
@@ -320,11 +345,11 @@ String pushStatic(String arg2, String inputFile) {
 			"D=M" +
 			"\n" +
 			"""@SP
-	           M=M+1
-	           A=M-1
-	           M=D
-	           
-	           """;
+			   M=M+1
+			   A=M-1
+			   M=D
+			   
+			   """;
 }
 
 String popStatic(String arg2, String inputFile) {
@@ -337,8 +362,10 @@ String popStatic(String arg2, String inputFile) {
 			inputFile  +
 			"." +
 			arg2 +
-			"\n" +
-			"D=M\n\n";	
+			"""
+			   M=D
+			   
+			   """;	
 }
 
 String pushPointerOrTemp(Integer register) {

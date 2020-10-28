@@ -12,15 +12,13 @@ import parser {
 
 "Run the module `main`."
 shared void run() {
-	String stage = "MemoryAccess";
-	String test = "BasicTest";
+	String filename = "StaticTest";
 	// locate input and output files
-	String dir = "./resource/"+stage+"/"+test+"/";
-	String inputFile = dir+test+".vm";
-	String outputFile = dir+test+".asm";
+	String path = "./resource/MemoryAccess/"+filename+"/";
 	// build output
-	String output = translateVM(inputFile);
+	String output = translateVM(path, filename);
 	// write output
+	String outputFile = path+filename+".asm";
 	writeFile(outputFile, output);
 	// print contents of file
 	print(output);
