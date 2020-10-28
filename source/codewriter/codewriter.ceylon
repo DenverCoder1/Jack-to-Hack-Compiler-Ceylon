@@ -1,3 +1,6 @@
+// Lab 1 - VM Translator
+// Jonah Lawrence
+// Daniel Klein
 import ceylon.collection {
 	HashMap
 }
