@@ -152,28 +152,44 @@ String translatePush(String arg1, String arg2, String inputFile) {
 	else if (arg1 in ["local", "argument", "this", "that"]) {
 		// local
 		if (arg1 == "local") {
-			return pushStackSegment("LCL",arg2);
+			return pushSegment("LCL",arg2);
 		}
 		// argument
 		else if (arg1 == "argument") {
-			return pushStackSegment("ARG",arg2);
+			return pushSegment("ARG",arg2);
 		}
 		// this
 		else if (arg1 == "this") {
-			return pushStackSegment("THIS",arg2);
+			return pushSegment("THIS",arg2);
 		}
 		// that
 		else {
-			return pushStackSegment("THAT",arg2);
+			return pushSegment("THAT",arg2);
 		}
 	}
 	// static
 	else if (arg1 == "static") {
-		return ""; // TODO
+		return pushStatic(arg2, inputFile);
+	}
+	// pointer
+	else if (arg1 == "pointer") {
+		Integer|ParseException register = Integer.parse(arg2);
+		if (is Integer register) {
+			return pushPointerOrTemp(register + 3);
+		}
+		throw Exception("Illegal argument 2 to push pointer");
+	}
+	// temp
+	else if (arg1 == "temp") {
+		Integer|ParseException register = Integer.parse(arg2);
+		if (is Integer register) {
+			return pushPointerOrTemp(register + 5);
+		}
+		throw Exception("Illegal argument 2 to push temp");
 	}
 	// other
 	else {
-		throw Exception("Illegal push argument");
+		throw Exception("Illegal push argument 1");
 	}
 }
 
@@ -182,63 +198,79 @@ String translatePop (String arg1, String arg2, String inputFile) {
 	if (arg1 in ["local", "argument", "this", "that"]) {
 		// local
 		if (arg1 == "local") {
-			return popStackSegment("LCL",arg2);
+			return popSegment("LCL",arg2);
 		}
 		// argument
 		else if (arg1 == "argument") {
-			return popStackSegment("ARG",arg2);
+			return popSegment("ARG",arg2);
 		}
 		// this
 		else if (arg1 == "this") {
-			return popStackSegment("THIS",arg2);
+			return popSegment("THIS",arg2);
 		}
 		// that
 		else {
-			return popStackSegment("THAT",arg2);
+			return popSegment("THAT",arg2);
 		}
 	}
 	// static
 	else if (arg1 == "static") {
-		return ""; // TODO
+		return popStatic(arg2, inputFile);
+	}
+	// pointer
+	else if (arg1 == "pointer") {
+		Integer|ParseException register = Integer.parse(arg2);
+		if (is Integer register) {
+			return popPointerOrTemp(register + 3);
+		}
+		throw Exception("Illegal argument 2 to pop pointer");
+	}
+	// temp
+	else if (arg1 == "temp") {
+		Integer|ParseException register = Integer.parse(arg2);
+		if (is Integer register) {
+			return popPointerOrTemp(register + 5);
+		}
+		throw Exception("Illegal argument 2 to pop temp");
 	}
 	// other
 	else {
-		throw Exception("Illegal pop argument");
+		throw Exception("Illegal pop argument 1");
 	}
 }
 
 // Translate goto commands
-String translateGoto(String label){
+String translateGoto(String label) {
 	return "";  // TODO
 }
 
 // Translate label commands
-String translateLabel(String label){
+String translateLabel(String label) {
 	return ""; // TODO
 }
 
 // Translate if commands
-String translateIf(String label){
+String translateIf(String label) {
 	return ""; // TODO
 }
 
 // Translate fucntion commands
-String translateFunction(String functionName, String numVars){
+String translateFunction(String functionName, String numVars) {
 	return ""; // TODO
 }
 
 // Translate call commands
-String translateCall(String functionName, String numArgs){
+String translateCall(String functionName, String numArgs) {
 	return ""; // TODO
 }
 
 // Translate return commands
-String translateReturn(){
+String translateReturn() {
 	return ""; // TODO
 }
 
 //push local/argument/this/that to the stack
-String pushStackSegment(String type, String arg2){
+String pushSegment(String type, String arg2) {
 	return """@""" + 
 			arg2 + 
 			"\n" +
@@ -251,14 +283,13 @@ String pushStackSegment(String type, String arg2){
 			   @SP
 			   M=M+A
 			   A=M-1
-			   M=D""" + "\n\n";
-	
-	
-	
+			   M=D
+			   
+			   """;
 }
 
 // pop local/argument/this/that to be stored in R13
-String popStackSegment(String type, String arg2){
+String popSegment(String type, String arg2) {
 	return """@""" + 
 			arg2 + 
 			"\n" +
@@ -275,33 +306,59 @@ String popStackSegment(String type, String arg2){
 			   M=0
 			   @R13
 			   A=M
-			   M=D""" + "\n\n";
-			  
-	
+			   M=D
+			   
+			   """;
 }
 
-String pushStackStatic(String arg2, String inputFile){
+String pushStatic(String arg2, String inputFile) {
 	return  "@" +
 			inputFile  +
 			"." +
 			arg2 +
 			"\n" +
 			"D=M" +
+			"\n" +
 			"""@SP
 	           M=M+1
 	           A=M-1
-	           M=D""";
+	           M=D
+	           
+	           """;
 }
 
-String popStackStatic(String arg2, String inputFile){
+String popStatic(String arg2, String inputFile) {
 	return """@SP
 	          AM=M-1
 	          D=M
-	          M=0""" +
+	          M=0
+	          """ +
 			"@" +
 			inputFile  +
 			"." +
 			arg2 +
 			"\n" +
-			"D=M";	
+			"D=M\n\n";	
+}
+
+String pushPointerOrTemp(Integer register) {
+	return "@``register``\n" + 
+			"D=M" +
+			"""
+			   @SP
+			   M=M+1
+			   A=M-1
+			   M=D
+			   
+			   """;
+}
+
+String popPointerOrTemp(Integer register) {
+	return """@SP
+	          AM=M-1
+	          D=M
+	          M=0
+	          """ +
+			"@``register``\n" + 
+			"M=D\n\n";
 }

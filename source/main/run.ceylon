@@ -12,8 +12,8 @@ import parser {
 
 "Run the module `main`."
 shared void run() {
-	String stage = "StackArithmetic";
-	String test = "StackTest";
+	String stage = "MemoryAccess";
+	String test = "BasicTest";
 	// locate input and output files
 	String dir = "./resource/"+stage+"/"+test+"/";
 	String inputFile = dir+test+".vm";
