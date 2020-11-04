@@ -15,7 +15,7 @@ import ceylon.regex {
 	MatchResult
 }
 
-"Run the module `main`."
+"Run the module `vmtranslator`."
 shared void run() {
 	// get input file from command line argument
 	String defaultPath = "./resource/MemoryAccess/StaticTest/StaticTest.vm";
