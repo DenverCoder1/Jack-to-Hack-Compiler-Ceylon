@@ -1,32 +1,3 @@
-// set sp 256
-@256
-D=A
-@SP
-M=D
-
-// set local 300
-@300
-D=A
-@LCL
-M=D
-
-// set argument 400
-@400
-D=A
-@ARG
-M=D
-
-// set this 3000
-@3000
-D=A
-@THIS
-M=D
-
-// set that 3010
-@3010
-D=A
-@THAT
-M=D
 // push constant 3030
 @3030
 D=A

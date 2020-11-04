@@ -1,6 +1,7 @@
 // Lab 1 - VM Translator
 // Jonah Lawrence
 // Daniel Klein
+
 import codewriter {
 	comment,
 	translateLine,
@@ -17,11 +18,10 @@ import files {
 }
 
 // translate all lines of a vm program to asm
-
 shared String translateVM(String path, String filename) {
 	String[] allLines = readLines(path + filename + ".vm");
 	variable String output = "";
-	output += initializeConstants();
+	// output += initializeConstants();
 	for (rawLine in allLines) {
 		// strip comments and whitespace
 		String line = stripCommentsAndWhitespace(rawLine);

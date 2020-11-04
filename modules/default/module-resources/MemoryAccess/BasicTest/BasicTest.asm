@@ -27,6 +27,7 @@ M=D
 D=A
 @THAT
 M=D
+
 // push constant 10
 @10
 D=A
