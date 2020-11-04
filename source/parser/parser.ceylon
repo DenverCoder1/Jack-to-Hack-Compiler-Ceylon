@@ -21,7 +21,7 @@ import files {
 shared String translateVM(String path, String filename) {
 	String[] allLines = readLines(path + filename + ".vm");
 	variable String output = "";
-	output += initializeConstants();
+	// output += initializeConstants();
 	for (rawLine in allLines) {
 		// strip comments and whitespace
 		String line = stripCommentsAndWhitespace(rawLine);
