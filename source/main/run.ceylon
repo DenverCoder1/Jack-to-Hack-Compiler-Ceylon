@@ -17,7 +17,7 @@ import ceylon.regex {
 
 "Run the module `main`."
 shared void run() {
-	// locate input and output files
+	// get input file from command line argument
 	String defaultPath = "./resource/MemoryAccess/StaticTest/StaticTest.vm";
 	String path = process.arguments[0] else defaultPath;
 	// parse path
@@ -27,11 +27,11 @@ shared void run() {
 	if (exists directoryMatch) {
 		directory = directoryMatch.matched;
 	}
-	String filename = re.replace(path, "");
+	String filename = re.replace(path, "").replace(".vm", "");
 	// build output
 	String output = translateVM(directory, filename);
 	// write output
-	String outputFile = directory+filename.replace(".vm", ".asm");
+	String outputFile = directory + filename + ".asm";
 	writeFile(outputFile, output);
 	// print contents of file for debugging
 	print(output);
