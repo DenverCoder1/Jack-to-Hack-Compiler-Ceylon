@@ -1,16 +1,12 @@
 // Lab 1 - VM Translator
 // Jonah Lawrence
 // Daniel Klein
+
 import ceylon.collection {
 	HashMap
 }
 
 shared variable Integer labelNumber = 0;
-
-// Comment a line of vm
-shared String comment(String line) {
-	return "// " + line + "\n";
-}
 
 // Translate VM command to ASM
 shared String translateLine(String commandType, String arg1, String arg2, String inputFile) {
@@ -44,6 +40,12 @@ shared String translateLine(String commandType, String arg1, String arg2, String
 	return "";
 }
 
+// Comment a line of vm
+shared String comment(String line) {
+	return "// " + line + "\n";
+}
+
+// initialize sp, local, argument, this, that
 shared String initializeConstants() {
 	return """// set sp 256
 	          @256
@@ -172,7 +174,7 @@ String translateComparator(String operator) {
 
 
 
-// Translate push comands
+// Translate push commands
 String translatePush(String arg1, String arg2, String inputFile) {
 	if (arg1 == "constant") {
 		 return translatePushConstant(arg2);
@@ -221,7 +223,7 @@ String translatePush(String arg1, String arg2, String inputFile) {
 	}
 }
 
-// Translate pop comands
+// Translate pop commands
 String translatePop (String arg1, String arg2, String inputFile) {
 	if (arg1 in ["local", "argument", "this", "that"]) {
 		// local
@@ -339,6 +341,7 @@ String popSegment(String type, String arg2) {
 			   """;
 }
 
+// translate push static
 String pushStatic(String arg2, String inputFile) {
 	return  "@" +
 			inputFile  +
@@ -355,6 +358,7 @@ String pushStatic(String arg2, String inputFile) {
 			   """;
 }
 
+// translate pop static
 String popStatic(String arg2, String inputFile) {
 	return """@SP
 	          AM=M-1
@@ -371,6 +375,7 @@ String popStatic(String arg2, String inputFile) {
 			   """;	
 }
 
+// translate push pointer / push temp
 String pushPointerOrTemp(Integer register) {
 	return "@``register``\n" + 
 			"D=M" +
@@ -383,6 +388,7 @@ String pushPointerOrTemp(Integer register) {
 			   """;
 }
 
+// translate pop pointer / pop temp
 String popPointerOrTemp(Integer register) {
 	return """@SP
 	          AM=M-1

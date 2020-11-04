@@ -2,7 +2,6 @@
 // Jonah Lawrence
 // Daniel Klein
 
-// import from local modules
 import files {
 	writeFile
 }
@@ -11,8 +10,8 @@ import parser {
 }
 import ceylon.regex {
 	Regex,
-	regex,
-	MatchResult
+	MatchResult,
+	regex
 }
 
 "Run the module `vmtranslator`."
@@ -35,4 +34,5 @@ shared void run() {
 	writeFile(outputFile, output);
 	// print contents of file for debugging
 	print(output);
+	print(outputFile);
 }
