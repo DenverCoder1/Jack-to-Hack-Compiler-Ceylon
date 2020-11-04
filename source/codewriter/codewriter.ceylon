@@ -343,14 +343,9 @@ String popSegment(String type, String arg2) {
 
 // translate push static
 String pushStatic(String arg2, String inputFile) {
-	return  "@" +
-			inputFile  +
-			"." +
-			arg2 +
-			"\n" +
-			"D=M" +
-			"\n" +
-			"""@SP
+	return  "@``inputFile``.``arg2``\n" +
+			"""D=M
+			   @SP
 			   M=M+1
 			   A=M-1
 			   M=D
@@ -365,12 +360,8 @@ String popStatic(String arg2, String inputFile) {
 	          D=M
 	          M=0
 	          """ +
-			"@" +
-			inputFile  +
-			"." +
-			arg2 +
-			"""
-			   M=D
+			"@``inputFile``.``arg2``\n" +
+			"""M=D
 			   
 			   """;	
 }
