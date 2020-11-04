@@ -9,17 +9,30 @@ import files {
 import parser {
 	translateVM
 }
+import ceylon.regex {
+	Regex,
+	regex,
+	MatchResult
+}
 
 "Run the module `main`."
 shared void run() {
-	String filename = "StaticTest";
 	// locate input and output files
-	String path = "./resource/MemoryAccess/"+filename+"/";
+	String defaultPath = "./resource/MemoryAccess/StaticTest/StaticTest.vm";
+	String path = process.arguments[0] else defaultPath;
+	// parse path
+	Regex re = regex("(.*/)");
+	variable String directory = "";
+	MatchResult? directoryMatch = re.find(path);
+	if (exists directoryMatch) {
+		directory = directoryMatch.matched;
+	}
+	String filename = re.replace(path, "");
 	// build output
-	String output = translateVM(path, filename);
+	String output = translateVM(directory, filename);
 	// write output
-	String outputFile = path+filename+".asm";
+	String outputFile = directory+filename.replace(".vm", ".asm");
 	writeFile(outputFile, output);
-	// print contents of file
+	// print contents of file for debugging
 	print(output);
 }

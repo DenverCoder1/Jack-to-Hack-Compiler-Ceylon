@@ -17,11 +17,12 @@ import files {
 }
 
 // translate all lines of a vm program to asm
+
 shared String translateVM(String path, String filename) {
-	String[] allLines = readLines(path+filename+".vm");
+	String[] allLines = readLines(path + filename);
 	variable String output = "";
 	output += initializeConstants();
-	for (rawLine in allLines) { 
+	for (rawLine in allLines) {
 		// strip comments and whitespace
 		String line = stripCommentsAndWhitespace(rawLine);
 		// skip empty lines
@@ -48,28 +49,28 @@ shared String translateVM(String path, String filename) {
 // get command type
 String? getCommandType(String[] splitLine) {
 	// map of commands
-	value commands = HashMap<String, String> {
-		"add"	    ->	"C_ARITHMETIC",
-		"sub"	    ->	"C_ARITHMETIC",
-		"neg"	    ->	"C_ARITHMETIC",
-		"eq"	    ->	"C_ARITHMETIC",
-		"gt"	    ->	"C_ARITHMETIC",
-		"lt"	    ->	"C_ARITHMETIC",
-		"and"	    ->	"C_ARITHMETIC",
-		"or"	    ->	"C_ARITHMETIC",
-		"not"	    ->	"C_ARITHMETIC",
-		"push"	    ->	"C_PUSH",
-		"pop"	    ->	"C_POP",
-		"goto"	    ->	"C_GOTO",
-		"label"	    ->	"C_LABEL",
-		"if"	    ->	"C_IF",
-		"function"	->	"C_FUNCTION",
-		"call"	    ->	"C_CALL",
-		"return"	->	"C_RETURN"
+	value commands = HashMap<String,String> {
+		"add"->"C_ARITHMETIC",
+		"sub"->"C_ARITHMETIC",
+		"neg"->"C_ARITHMETIC",
+		"eq"->"C_ARITHMETIC",
+		"gt"->"C_ARITHMETIC",
+		"lt"->"C_ARITHMETIC",
+		"and"->"C_ARITHMETIC",
+		"or"->"C_ARITHMETIC",
+		"not"->"C_ARITHMETIC",
+		"push"->"C_PUSH",
+		"pop"->"C_POP",
+		"goto"->"C_GOTO",
+		"label"->"C_LABEL",
+		"if"->"C_IF",
+		"function"->"C_FUNCTION",
+		"call"->"C_CALL",
+		"return"->"C_RETURN"
 	};
 	// get command
 	if (splitLine.size > 0) {
-		String token = splitLine[0] else  "";
+		String token = splitLine[0] else "";
 		return commands[token];
 	}
 	// no command
@@ -86,8 +87,7 @@ String? getFirstArg(String[] splitLine, String commandType) {
 	}
 	try {
 		return splitLine[1];
-	}
-	catch (Exception e) {
+	} catch (Exception e) {
 		throw Exception("Invalid VM Command");
 	}
 }
@@ -97,8 +97,7 @@ String? getSecondArg(String[] splitLine, String commandType) {
 	if (commandType in ["C_PUSH", "C_POP", "C_FUNCTION"]) {
 		String arg2 = splitLine[2] else "0";
 		return regex("[^0-9\\-]").replace(arg2, "");
-	}
-	else {
+	} else {
 		return null;
 	}
 }
