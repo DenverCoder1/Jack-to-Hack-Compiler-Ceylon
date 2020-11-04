@@ -1,33 +1,3 @@
-// set sp 256
-@256
-D=A
-@SP
-M=D
-
-// set local 300
-@300
-D=A
-@LCL
-M=D
-
-// set argument 400
-@400
-D=A
-@ARG
-M=D
-
-// set this 3000
-@3000
-D=A
-@THIS
-M=D
-
-// set that 3010
-@3010
-D=A
-@THAT
-M=D
-
 // push constant 111
 @111
 D=A
@@ -35,7 +5,7 @@ D=A
 M=M+1
 A=M-1
 M=D
- 
+
 // push constant 333
 @333
 D=A
@@ -43,7 +13,7 @@ D=A
 M=M+1
 A=M-1
 M=D
- 
+
 // push constant 888
 @888
 D=A
@@ -51,7 +21,7 @@ D=A
 M=M+1
 A=M-1
 M=D
- 
+
 // pop static 8
 @SP
 AM=M-1
