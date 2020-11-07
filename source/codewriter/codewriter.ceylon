@@ -115,14 +115,11 @@ shared class CodeWriter {
 	
 	// Translate Add, Sub, And, Or
 	String translateBinaryOperator(String operator) {
-		return """@SP
-		          AM=M-1
-		          D=M
-		          M=0
-		          @SP
-		          A=M-1
-		          """ + 
-				"M=M" + operator + "D" + "\n\n";
+		return popToD() +
+			   """@SP
+			      A=M-1
+			      """ + 
+				"M=M``operator``D\n\n";
 	}
 	
 	// Translate Not and Neg
@@ -130,34 +127,27 @@ shared class CodeWriter {
 		return """@SP
 		          A=M-1
 		          """ + 
-				"M=" + operator + "M" + "\n\n";
+				"M=``operator``M\n\n";
 	}
 	
 	
 	// Translate Push Constant
-	String translatePushConstant(String x) {
-		return  "@" + x + "\n" + 
-				"""D=A
-				   @SP
-				   M=M+1
-				   A=M-1
-				   M=D
-				   
-				   """;
+	String translatePushConstant(String constant) {
+		return  "@" + constant + "\n" + 
+				"D=A\n" +
+				pushToD() + 
+				"\n";
 	}
 	
 	// Translate Eq, Gt, Lt
 	String translateComparator(String operator) {
 		//looking for more consice version
 		labelNumber += 1;
-		return """@SP
-		          AM=M-1
-		          D=M
-		          M=0
-		          @SP
-		          A=M-1
-		          D=M-D
-		          @true_""" + labelNumber.string + "\n" +
+		return popToD() + 
+			   """@SP
+			      A=M-1
+			      D=M-D
+			      @true_""" + labelNumber.string + "\n" +
 				"D;J" +
 				operator + "\n" +
 				"@false_" + labelNumber.string + "\n" +
@@ -233,19 +223,19 @@ shared class CodeWriter {
 		if (arg1 in ["local", "argument", "this", "that"]) {
 			// local
 			if (arg1 == "local") {
-				return popSegment("LCL",arg2);
+				return popSegment("LCL", arg2);
 			}
 			// argument
 			else if (arg1 == "argument") {
-				return popSegment("ARG",arg2);
+				return popSegment("ARG", arg2);
 			}
 			// this
 			else if (arg1 == "this") {
-				return popSegment("THIS",arg2);
+				return popSegment("THIS", arg2);
 			}
 			// that
 			else {
-				return popSegment("THAT",arg2);
+				return popSegment("THAT", arg2);
 			}
 		}
 		// static
@@ -274,34 +264,20 @@ shared class CodeWriter {
 		}
 	}
 	
-	// Translate goto commands
-	String translateGoto(String label) {
-		return "";  // TODO
+	String pushToD() {
+		return """@SP
+		          M=M+1
+		          A=M-1
+		          M=D
+		          """;
 	}
 	
-	// Translate label commands
-	String translateLabel(String label) {
-		return ""; // TODO
-	}
-	
-	// Translate if commands
-	String translateIf(String label) {
-		return ""; // TODO
-	}
-	
-	// Translate fucntion commands
-	String translateFunction(String functionName, String numVars) {
-		return ""; // TODO
-	}
-	
-	// Translate call commands
-	String translateCall(String functionName, String numArgs) {
-		return ""; // TODO
-	}
-	
-	// Translate return commands
-	String translateReturn() {
-		return ""; // TODO
+	String popToD() {
+		return """@SP
+		          AM=M-1
+		          D=M
+		          M=0
+		          """;
 	}
 	
 	//push local/argument/this/that to the stack
@@ -314,32 +290,25 @@ shared class CodeWriter {
 				type + 
 				"\n" +
 				"""A=M+D
-				   D=M
-				   @SP
-				   M=M+1
-				   A=M-1
-				   M=D
-				   
-				   """;
+				   D=M""" +
+				"\n" +
+				pushToD() +
+				"\n";
 	}
 	
 	// pop local/argument/this/that to be stored in R13
 	String popSegment(String type, String arg2) {
-		return """@""" + 
-				arg2 + 
-				"\n" +
+		return "@``arg2``\n" + 
 				"""D=A
 				   @""" + 
 				type + 
 				"\n" +
 				"""D=D+M
 				   @R13
-				   M=D
-				   @SP
-				   AM=M-1
-				   D=M
-				   M=0
-				   @R13
+				   M=D""" +
+				"\n" +
+				popToD() +
+				"""@R13
 				   A=M
 				   M=D
 				   
@@ -349,22 +318,14 @@ shared class CodeWriter {
 	// translate push static
 	String pushStatic(String arg2, String inputFile) {
 		return  "@``inputFile``.``arg2``\n" +
-				"""D=M
-				   @SP
-				   M=M+1
-				   A=M-1
-				   M=D
-				   
-				   """;
+				"D=M\n" + 
+				pushToD() +
+				"\n";
 	}
 	
 	// translate pop static
 	String popStatic(String arg2, String inputFile) {
-		return """@SP
-		          AM=M-1
-		          D=M
-		          M=0
-		          """ +
+		return popToD() +
 				"@``inputFile``.``arg2``\n" +
 				"""M=D
 				   
@@ -374,24 +335,56 @@ shared class CodeWriter {
 	// translate push pointer / push temp
 	String pushPointerOrTemp(Integer register) {
 		return "@``register``\n" + 
-				"D=M" +
-				"""
-				   @SP
-				   M=M+1
-				   A=M-1
-				   M=D
-				   
-				   """;
+				"D=M\n" +
+				pushToD() + 
+				"\n";
 	}
 	
 	// translate pop pointer / pop temp
 	String popPointerOrTemp(Integer register) {
-		return """@SP
-		          AM=M-1
-		          D=M
-		          M=0
-		          """ +
+		return popToD() +
 				"@``register``\n" + 
 				"M=D\n\n";
+	}
+	
+	// Translate goto commands
+	String translateGoto(String arg1) {
+		return "@``arg1``\n" +
+				"0;JMP\n";
+	}
+	
+	// Translate label commands
+	String translateLabel(String arg1) {
+		return "(``arg1``)\n";
+	}
+	
+	// Translate if commands
+	String translateIf(String arg1) {
+		return popToD() +
+				"@``arg1``\n" +
+				"D;JNE\n";
+	}
+	
+	// Translate function commands
+	String translateFunction(String arg1, String arg2) {
+		variable String locals = "";
+		Integer|ParseException numLocals = Integer.parse(arg2);
+		if (is Integer numLocals) {
+			for (i in 0..numLocals) {
+				locals += translatePushConstant("0");
+				locals += popSegment("LCL", i.string);
+			}
+		}
+		return translateLabel(arg1) + locals;
+	}
+	
+	// Translate call commands
+	String translateCall(String arg1, String arg2) {
+		return ""; // TODO
+	}
+	
+	// Translate return commands
+	String translateReturn() {
+		return ""; // TODO
 	}
 }

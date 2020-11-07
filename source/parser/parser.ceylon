@@ -29,7 +29,6 @@ shared class Parser {
 	// translate all lines of a vm program to asm
 	shared String translateVM() {
 		variable String output = "";
-		// output += initializeConstants();
 		for (rawLine in allLines) {
 			// strip comments and whitespace
 			String line = stripCommentsAndWhitespace(rawLine);

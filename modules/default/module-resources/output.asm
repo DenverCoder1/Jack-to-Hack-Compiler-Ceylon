@@ -1,3 +1,33 @@
+// set sp 256
+@256
+D=A
+@SP
+M=D
+
+// set local 300
+@300
+D=A
+@LCL
+M=D
+
+// set argument 400
+@400
+D=A
+@ARG
+M=D
+
+// set this 3000
+@3000
+D=A
+@THIS
+M=D
+
+// set that 3010
+@3010
+D=A
+@THAT
+M=D
+
 // Translation of StaticTest.vm
 // ----------------------------------
 
@@ -52,7 +82,7 @@ M=D
 // push static 3
 @StaticTest.3
 D=M
-@SP
+@SP@SP
 M=M+1
 A=M-1
 M=D
@@ -60,7 +90,7 @@ M=D
 // push static 1
 @StaticTest.1
 D=M
-@SP
+@SP@SP
 M=M+1
 A=M-1
 M=D
@@ -77,7 +107,7 @@ M=M-D
 // push static 8
 @StaticTest.8
 D=M
-@SP
+@SP@SP
 M=M+1
 A=M-1
 M=D

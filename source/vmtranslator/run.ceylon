@@ -8,6 +8,9 @@ import files {
 import parser {
 	Parser
 }
+import codewriter {
+	CodeWriter
+}
 import ceylon.regex {
 	Regex,
 	MatchResult,
@@ -20,6 +23,9 @@ shared void run() {
 	String[] paths = process.arguments;
 	
 	variable String output = "";
+	CodeWriter codewriter = CodeWriter();
+	
+	output += codewriter.initializeConstants();
 	
 	// translate each vm file
 	for (path in paths) {
