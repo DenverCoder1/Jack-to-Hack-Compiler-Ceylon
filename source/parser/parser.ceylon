@@ -101,7 +101,7 @@ shared class Parser {
 	
 	// get second argument
 	String? getSecondArg(String[] splitLine, String commandType) {
-		if (commandType in ["C_PUSH", "C_POP", "C_FUNCTION"]) {
+		if (commandType in ["C_PUSH", "C_POP", "C_FUNCTION", "C_CALL"]) {
 			String arg2 = splitLine[2] else "0";
 			return regex("[^0-9\\-]").replace(arg2, "");
 		} else {
