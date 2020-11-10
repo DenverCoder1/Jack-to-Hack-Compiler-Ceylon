@@ -7,12 +7,16 @@ import ceylon.collection {
 }
 
 shared class CodeWriter {
+	
 	variable Integer labelNumber;
+	
+	variable Integer callNumber;
 	
 	shared new () {
 		this.labelNumber = 0;
+		this.callNumber = 0;
 	}
-	
+		
 	// Translate VM command to ASM
 	shared String translateLine(String commandType, String arg1, String arg2, String inputFile) {
 		if (commandType == "C_ARITHMETIC") {
@@ -381,11 +385,93 @@ shared class CodeWriter {
 	
 	// Translate call commands
 	String translateCall(String arg1, String arg2) {
-		return ""; // TODO
+		
+		callNumber += 1;
+		
+		return "@continuation.``arg1``." + callNumber.string + "\n" +
+				"D=A\n" +
+				pushToD() +
+				"""@LCL
+				   D=M
+				   """ +
+				pushToD() +
+				"""@ARG
+				   D=M
+				   """ +
+				pushToD() +
+				"""@THIS
+				   D=M
+				   """ +
+				pushToD() +
+				"""@THAT
+				   D=M
+				   """ +
+				pushToD() +
+				"""@SP
+				   D=M
+				   @5
+				   D=D-A
+				   @ARG
+				   M=D
+				   @SP
+				   D=M
+				   @LCL
+				   M=D
+				   """ + 
+				translateGoto(arg1) +
+				translateLabel("``arg1``." + callNumber.string);
+				
 	}
 	
 	// Translate return commands
 	String translateReturn() {
-		return ""; // TODO
+		return """@LCL
+		          D=M
+		          @R13
+		          M=D
+		          @5
+		          D=D-A
+		          A=D
+		          D=M
+		          @R14
+		          M=D""" + 
+				popToD() +
+				"""@ARG
+				   A=M
+				   M=D
+				   D=A+1
+				   @SP
+				   M=D
+				   @R13
+				   A=M-1
+				   D=M
+				   @THAT
+				   M=D
+				   @2
+				   D=A
+				   @R13
+				   D=M-D
+				   A=D
+				   D=M
+				   @THIS
+				   M=D
+				   @3
+				   D=A
+				   @R13
+				   D=M-D
+				   A=D
+				   D=M
+				   @ARG
+				   M=D
+				   @4
+				   D=M
+				   @R13
+				   D=M-D
+				   A=DS
+				   D=M
+				   @LCL
+				   M=D
+				   @R14
+				   0;JMP""";
 	}
 }
