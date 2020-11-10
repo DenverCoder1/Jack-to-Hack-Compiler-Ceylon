@@ -370,6 +370,7 @@ shared class CodeWriter {
 		variable String locals = "";
 		Integer|ParseException numLocals = Integer.parse(arg2);
 		if (is Integer numLocals) {
+			//Initialize the local variables of the callee
 			for (i in 0..numLocals) {
 				locals += translatePushConstant("0");
 				locals += popSegment("LCL", i.string);
