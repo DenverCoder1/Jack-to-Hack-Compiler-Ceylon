@@ -70,7 +70,7 @@ shared class Parser {
 			"pop"      -> "C_POP",
 			"goto"     -> "C_GOTO",
 			"label"    -> "C_LABEL",
-			"if"       -> "C_IF",
+			"if-goto"  -> "C_IF",
 			"function" -> "C_FUNCTION",
 			"call"     -> "C_CALL",
 			"return"   -> "C_RETURN"

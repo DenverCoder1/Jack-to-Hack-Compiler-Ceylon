@@ -20,7 +20,7 @@ import ceylon.regex {
 "Run the module `vmtranslator`."
 shared void run() {
 	// get vm files from command line arguments
-	String[] paths = process.arguments;
+	String[] paths = process.arguments.exceptLast;
 	
 	variable String output = "";
 	CodeWriter codewriter = CodeWriter();
@@ -46,7 +46,7 @@ shared void run() {
 	}
 	
 	// write output
-	String outputFile = "./resource/output.asm";
+	String outputFile = process.arguments.last else "./resource/output.asm";
 	writeFile(outputFile, output);
 	// print contents of file for debugging
 	print(output);

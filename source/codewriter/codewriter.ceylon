@@ -354,19 +354,19 @@ shared class CodeWriter {
 	// Translate goto commands
 	String translateGoto(String arg1) {
 		return "@``arg1``\n" +
-				"0;JMP\n";
+				"0;JMP\n\n";
 	}
 	
 	// Translate label commands
 	String translateLabel(String arg1) {
-		return "(``arg1``)\n";
+		return "(``arg1``)\n\n";
 	}
 	
 	// Translate if commands
 	String translateIf(String arg1) {
 		return popToD() +
 				"@``arg1``\n" +
-				"D;JNE\n";
+				"D;JNE\n\n";
 	}
 	
 	// Translate function commands
@@ -419,7 +419,8 @@ shared class CodeWriter {
 				   M=D
 				   """ + 
 				translateGoto(arg1) +
-				translateLabel("``arg1``." + callNumber.string);
+				translateLabel("``arg1``." + callNumber.string) + 
+				"\n\n";
 				
 	}
 	
@@ -434,7 +435,8 @@ shared class CodeWriter {
 		          A=D
 		          D=M
 		          @R14
-		          M=D""" + 
+		          M=D
+		          """ + 
 				popToD() +
 				"""@ARG
 				   A=M
@@ -464,14 +466,16 @@ shared class CodeWriter {
 				   @ARG
 				   M=D
 				   @4
-				   D=M
+				   D=A
 				   @R13
 				   D=M-D
-				   A=DS
+				   A=D
 				   D=M
 				   @LCL
 				   M=D
 				   @R14
-				   0;JMP""";
+				   0;JMP
+				   
+				   """;
 	}
 }
