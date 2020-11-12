@@ -62,30 +62,6 @@ shared class CodeWriter {
 		          @SP
 		          M=D
 		          
-		          // set local 300
-		          @300
-		          D=A
-		          @LCL
-		          M=D
-		          
-		          // set argument 400
-		          @400
-		          D=A
-		          @ARG
-		          M=D
-		          
-		          // set this 3000
-		          @3000
-		          D=A
-		          @THIS
-		          M=D
-		          
-		          // set that 3010
-		          @3010
-		          D=A
-		          @THAT
-		          M=D
-		          
 		          """;
 	}
 	
@@ -388,7 +364,7 @@ shared class CodeWriter {
 		
 		callNumber += 1;
 		
-		return "@continuation.``arg1``." + callNumber.string + "\n" +
+		return "@return.``arg1``." + callNumber.string + "\n" +
 				"D=A\n" +
 				pushToD() +
 				"""@LCL
@@ -419,7 +395,7 @@ shared class CodeWriter {
 				   M=D
 				   """ + 
 				translateGoto(arg1) +
-				translateLabel("``arg1``." + callNumber.string) + 
+				translateLabel("return.``arg1``." + callNumber.string) + 
 				"\n\n";
 				
 	}
