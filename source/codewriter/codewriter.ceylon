@@ -63,6 +63,31 @@ shared class CodeWriter {
 		          M=D
 		          
 		          """;
+		/*
+		          // set local 300
+		          @300
+		          D=A
+		          @LCL
+		          M=D
+		          
+		          // set argument 400
+		          @400
+		          D=A
+		          @ARG
+		          M=D
+		          
+		          // set this 3000
+		          @3000
+		          D=A
+		          @THIS
+		          M=D
+		          
+		          // set that 3010
+		          @3010
+		          D=A
+		          @THAT
+		          M=D
+		 */
 	}
 	
 	// Translate Arithmetic command
@@ -387,6 +412,9 @@ shared class CodeWriter {
 				   D=M
 				   @5
 				   D=D-A
+				   """ +
+				"@``arg2``\n" +
+				"""D=D-A
 				   @ARG
 				   M=D
 				   @SP
@@ -412,46 +440,47 @@ shared class CodeWriter {
 		          D=M
 		          @R14
 		          M=D
-		          """ + 
+		          """ +
 				popToD() +
-				"""@ARG
-				   A=M
-				   M=D
-				   D=A+1
-				   @SP
-				   M=D
-				   @R13
-				   A=M-1
-				   D=M
-				   @THAT
-				   M=D
-				   @2
-				   D=A
-				   @R13
-				   D=M-D
-				   A=D
-				   D=M
-				   @THIS
-				   M=D
-				   @3
-				   D=A
-				   @R13
-				   D=M-D
-				   A=D
-				   D=M
-				   @ARG
-				   M=D
-				   @4
-				   D=A
-				   @R13
-				   D=M-D
-				   A=D
-				   D=M
-				   @LCL
-				   M=D
-				   @R14
-				   0;JMP
-				   
-				   """;
+            	"""@ARG
+            	   A=M
+            	   M=D
+            	   D=A+1
+            	   @SP
+            	   M=D
+            	   @R13
+            	   A=M-1
+            	   D=M
+            	   @THAT
+            	   M=D
+            	   @2
+            	   D=A
+            	   @R13
+            	   D=M-D
+            	   A=D
+            	   D=M
+            	   @THIS
+            	   M=D
+            	   @3
+            	   D=A
+            	   @R13
+            	   D=M-D
+            	   A=D
+            	   D=M
+            	   @ARG
+            	   M=D
+            	   @4
+            	   D=A
+            	   @R13
+            	   D=M-D
+            	   A=D
+            	   D=M
+            	   @LCL
+            	   M=D
+            	   @R14
+            	   A=M
+            	   0;JMP
+            	   
+            	   """;
 	}
 }
