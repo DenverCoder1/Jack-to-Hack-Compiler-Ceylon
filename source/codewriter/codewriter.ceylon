@@ -63,31 +63,10 @@ shared class CodeWriter {
 		          M=D
 		          
 		          """;
-		/*
-		          // set local 300
-		          @300
-		          D=A
-		          @LCL
-		          M=D
-		          
-		          // set argument 400
-		          @400
-		          D=A
-		          @ARG
-		          M=D
-		          
-		          // set this 3000
-		          @3000
-		          D=A
-		          @THIS
-		          M=D
-		          
-		          // set that 3010
-		          @3010
-		          D=A
-		          @THAT
-		          M=D
-		 */
+	}
+	
+	shared String sysInit() {
+		return translateCall("Sys.init", "0");
 	}
 	
 	// Translate Arithmetic command
@@ -375,10 +354,12 @@ shared class CodeWriter {
 		variable String locals = "";
 		Integer|ParseException numLocals = Integer.parse(arg2);
 		if (is Integer numLocals) {
-			//Initialize the local variables of the callee
-			for (i in 0..numLocals) {
-				locals += translatePushConstant("0");
-				locals += popSegment("LCL", i.string);
+			if (numLocals > 0) {
+				//Initialize the local variables of the callee
+				for (i in 1..numLocals) {
+					locals += translatePushConstant("0");
+					locals += popSegment("LCL", i.string);
+				}
 			}
 		}
 		return translateLabel(arg1) + locals;
@@ -386,9 +367,7 @@ shared class CodeWriter {
 	
 	// Translate call commands
 	String translateCall(String arg1, String arg2) {
-		
 		callNumber += 1;
-		
 		return "@return.``arg1``." + callNumber.string + "\n" +
 				"D=A\n" +
 				pushToD() +

@@ -26,6 +26,7 @@ shared void run() {
 	CodeWriter codewriter = CodeWriter();
 	
 	output += codewriter.initializeConstants();
+	output += codewriter.sysInit();
 	
 	// translate each vm file
 	for (path in paths) {
@@ -42,7 +43,7 @@ shared void run() {
 		// build output
 		output += "// Translation of ``filename``.vm" +
 				  "\n// ----------------------------------\n\n";
-		output += parser.translateVM();
+		output += parser.translateVM(codewriter);
 	}
 	
 	// write output

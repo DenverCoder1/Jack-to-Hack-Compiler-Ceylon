@@ -18,16 +18,14 @@ import files {
 shared class Parser {
 	variable String[] allLines;
 	variable String filename;
-	CodeWriter codewriter;
 	
 	shared new (String dir, String file) {
 		allLines = readLines(dir + file + ".vm");
 		filename = file;
-		codewriter = CodeWriter();
 	}
 	
 	// translate all lines of a vm program to asm
-	shared String translateVM() {
+	shared String translateVM(CodeWriter codewriter) {
 		variable String output = "";
 		for (rawLine in allLines) {
 			// strip comments and whitespace

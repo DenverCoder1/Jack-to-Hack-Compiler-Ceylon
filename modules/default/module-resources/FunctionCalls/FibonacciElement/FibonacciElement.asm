@@ -4,32 +4,60 @@ D=A
 @SP
 M=D
 
-// Translation of Main.vm
-// ----------------------------------
-
-// function Main.fibonacci 0
-(Main.fibonacci)
-
-@0
+@return.Sys.init.1
 D=A
 @SP
 M=M+1
 A=M-1
 M=D
-
-@0
-D=A
 @LCL
-D=D+M
-@R13
+D=M
+@SP
+M=M+1
+A=M-1
+M=D
+@ARG
+D=M
+@SP
+M=M+1
+A=M-1
+M=D
+@THIS
+D=M
+@SP
+M=M+1
+A=M-1
+M=D
+@THAT
+D=M
+@SP
+M=M+1
+A=M-1
 M=D
 @SP
-AM=M-1
 D=M
-M=0
-@R13
-A=M
+@5
+D=D-A
+@0
+D=D-A
+@ARG
 M=D
+@SP
+D=M
+@LCL
+M=D
+@Sys.init
+0;JMP
+
+(return.Sys.init.1)
+
+
+
+// Translation of Main.vm
+// ----------------------------------
+
+// function Main.fibonacci 0
+(Main.fibonacci)
 
 // push argument 0
 @0
@@ -188,84 +216,6 @@ A=M-1
 M=M-D
 
 // call Main.fibonacci 1  // computes fib(n-2)
-@return.Main.fibonacci.1
-D=A
-@SP
-M=M+1
-A=M-1
-M=D
-@LCL
-D=M
-@SP
-M=M+1
-A=M-1
-M=D
-@ARG
-D=M
-@SP
-M=M+1
-A=M-1
-M=D
-@THIS
-D=M
-@SP
-M=M+1
-A=M-1
-M=D
-@THAT
-D=M
-@SP
-M=M+1
-A=M-1
-M=D
-@SP
-D=M
-@5
-D=D-A
-@1
-D=D-A
-@ARG
-M=D
-@SP
-D=M
-@LCL
-M=D
-@Main.fibonacci
-0;JMP
-
-(return.Main.fibonacci.1)
-
-
-
-// push argument 0
-@0
-D=A
-@ARG
-A=M+D
-D=M
-@SP
-M=M+1
-A=M-1
-M=D
-
-// push constant 1
-@1
-D=A
-@SP
-M=M+1
-A=M-1
-M=D
-
-// sub
-@SP
-AM=M-1
-D=M
-M=0
-@SP
-A=M-1
-M=M-D
-
-// call Main.fibonacci 1  // computes fib(n-1)
 @return.Main.fibonacci.2
 D=A
 @SP
@@ -312,6 +262,84 @@ M=D
 0;JMP
 
 (return.Main.fibonacci.2)
+
+
+
+// push argument 0
+@0
+D=A
+@ARG
+A=M+D
+D=M
+@SP
+M=M+1
+A=M-1
+M=D
+
+// push constant 1
+@1
+D=A
+@SP
+M=M+1
+A=M-1
+M=D
+
+// sub
+@SP
+AM=M-1
+D=M
+M=0
+@SP
+A=M-1
+M=M-D
+
+// call Main.fibonacci 1  // computes fib(n-1)
+@return.Main.fibonacci.3
+D=A
+@SP
+M=M+1
+A=M-1
+M=D
+@LCL
+D=M
+@SP
+M=M+1
+A=M-1
+M=D
+@ARG
+D=M
+@SP
+M=M+1
+A=M-1
+M=D
+@THIS
+D=M
+@SP
+M=M+1
+A=M-1
+M=D
+@THAT
+D=M
+@SP
+M=M+1
+A=M-1
+M=D
+@SP
+D=M
+@5
+D=D-A
+@1
+D=D-A
+@ARG
+M=D
+@SP
+D=M
+@LCL
+M=D
+@Main.fibonacci
+0;JMP
+
+(return.Main.fibonacci.3)
 
 
 
@@ -384,27 +412,6 @@ A=M
 // function Sys.init 0
 (Sys.init)
 
-@0
-D=A
-@SP
-M=M+1
-A=M-1
-M=D
-
-@0
-D=A
-@LCL
-D=D+M
-@R13
-M=D
-@SP
-AM=M-1
-D=M
-M=0
-@R13
-A=M
-M=D
-
 // push constant 4
 @4
 D=A
@@ -414,7 +421,7 @@ A=M-1
 M=D
 
 // call Main.fibonacci 1   // computes the 4'th fibonacci element
-@return.Main.fibonacci.1
+@return.Main.fibonacci.4
 D=A
 @SP
 M=M+1
@@ -459,7 +466,7 @@ M=D
 @Main.fibonacci
 0;JMP
 
-(return.Main.fibonacci.1)
+(return.Main.fibonacci.4)
 
 
 
