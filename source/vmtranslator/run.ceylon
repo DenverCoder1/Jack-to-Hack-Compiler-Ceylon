@@ -25,8 +25,8 @@ shared void run() {
 	variable String output = "";
 	CodeWriter codewriter = CodeWriter();
 	
-	// output += codewriter.initializeConstants();
-	// output += codewriter.sysInit();
+	output += codewriter.initializeConstants();
+	output += codewriter.sysInit();
 	
 	// translate each vm file
 	for (path in paths) {

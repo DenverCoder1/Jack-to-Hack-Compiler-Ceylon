@@ -1,58 +1,3 @@
-// set sp 256
-@256
-D=A
-@SP
-M=D
-
-@return.Sys.init.1
-D=A
-@SP
-M=M+1
-A=M-1
-M=D
-@LCL
-D=M
-@SP
-M=M+1
-A=M-1
-M=D
-@ARG
-D=M
-@SP
-M=M+1
-A=M-1
-M=D
-@THIS
-D=M
-@SP
-M=M+1
-A=M-1
-M=D
-@THAT
-D=M
-@SP
-M=M+1
-A=M-1
-M=D
-@SP
-D=M
-@5
-D=D-A
-@0
-D=D-A
-@ARG
-M=D
-@SP
-D=M
-@LCL
-M=D
-@Sys.init
-0;JMP
-
-(return.Sys.init.1)
-
-
-
 // Translation of Sys.vm
 // ----------------------------------
 
@@ -92,7 +37,7 @@ M=0
 M=D
 
 // call Sys.main 0
-@return.Sys.main.2
+@return.Sys.main.1
 D=A
 @SP
 M=M+1
@@ -137,7 +82,7 @@ M=D
 @Sys.main
 0;JMP
 
-(return.Sys.main.2)
+(return.Sys.main.1)
 
 
 
@@ -374,7 +319,7 @@ A=M-1
 M=D
 
 // call Sys.add12 1
-@return.Sys.add12.3
+@return.Sys.add12.2
 D=A
 @SP
 M=M+1
@@ -419,7 +364,7 @@ M=D
 @Sys.add12
 0;JMP
 
-(return.Sys.add12.3)
+(return.Sys.add12.2)
 
 
 
