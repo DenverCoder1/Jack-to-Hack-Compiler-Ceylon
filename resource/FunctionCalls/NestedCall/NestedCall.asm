@@ -37,7 +37,7 @@ M=0
 M=D
 
 // call Sys.main 0
-@return.Sys.main.2
+@return.Sys.main.1
 D=A
 @SP
 M=M+1
@@ -82,7 +82,7 @@ M=D
 @Sys.main
 0;JMP
 
-(return.Sys.main.2)
+(return.Sys.main.1)
 
 
 
@@ -319,7 +319,7 @@ A=M-1
 M=D
 
 // call Sys.add12 1
-@return.Sys.add12.3
+@return.Sys.add12.2
 D=A
 @SP
 M=M+1
@@ -364,7 +364,7 @@ M=D
 @Sys.add12
 0;JMP
 
-(return.Sys.add12.3)
+(return.Sys.add12.2)
 
 
 
