@@ -1,4 +1,4 @@
-// Lab 1 - VM Translator
+// VM Translator
 // Jonah Lawrence
 // Daniel Klein
 
