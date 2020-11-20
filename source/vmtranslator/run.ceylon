@@ -3,7 +3,8 @@
 // Daniel Klein
 
 import files {
-	writeFile
+	writeFile,
+	listVMFilesInDirectory
 }
 import parser {
 	Parser
@@ -20,7 +21,7 @@ import ceylon.regex {
 "Run the module `vmtranslator`."
 shared void run() {
 	// get vm files from command line arguments
-	String[] paths = process.arguments.exceptLast;
+	String[] paths = listVMFilesInDirectory(process.arguments[0] else "./");
 	
 	variable String output = "";
 	CodeWriter codewriter = CodeWriter();
@@ -31,7 +32,7 @@ shared void run() {
 	// translate each vm file
 	for (path in paths) {
 		// parse path
-		Regex re = regex("(.*/)");
+		Regex re = regex("(.*[/\\\\])");
 		variable String directory = "";
 		MatchResult? directoryMatch = re.find(path);
 		if (exists directoryMatch) {

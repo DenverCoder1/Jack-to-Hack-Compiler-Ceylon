@@ -5,6 +5,7 @@
 import ceylon.file {
 	File,
 	Nil,
+	Directory,
 	Resource,
 	parsePath,
 	createFileIfNil,
@@ -35,5 +36,26 @@ shared String[] readLines(String filePath) {
 	}
 	else {
 		throw Exception("Resource is not a file.");
+	}
+}
+
+// parsePath
+shared String[] listVMFilesInDirectory(String path) {
+	Resource resource = parsePath(path).resource;
+	// list all vm files in directory
+	if (is Directory resource) {
+		variable String[] vmFiles = [];
+		for (file in resource.childPaths("*.vm")) {
+			vmFiles = vmFiles.append([file.string]);
+		}
+		return vmFiles;
+	}
+	// return single file
+	else if (is File resource) {
+		return [path];
+	}
+	// file/directory doesn't exist
+	else {
+		throw Exception("Argument is not a directory or file.");
 	}
 }
