@@ -9,6 +9,7 @@ import ceylon.file {
 	Resource,
 	parsePath,
 	createFileIfNil,
+	forEachLine,
 	lines
 }
 
@@ -27,6 +28,22 @@ shared void writeFile(String filePath, String text) {
 	}
 }
 
+// read a file and return a String
+shared String readFile(String filePath) {
+	Resource resource = parsePath(filePath).resource;
+	// check the type of the resource
+	if (is File resource) {
+		variable String file = "";
+		forEachLine(resource, (String line) {
+			file += line + "\n";
+		});
+		return file;
+	}
+	else {
+		throw Exception("Resource is not a file.");
+	}
+}
+
 // read a file and return a list of all lines
 shared String[] readLines(String filePath) {
 	Resource resource = parsePath(filePath).resource;
@@ -40,15 +57,15 @@ shared String[] readLines(String filePath) {
 }
 
 // parsePath
-shared String[] listVMFilesInDirectory(String path) {
+shared String[] listFilesInDirectory(String path, String fileType = "*") {
 	Resource resource = parsePath(path).resource;
 	// list all vm files in directory
 	if (is Directory resource) {
-		variable String[] vmFiles = [];
-		for (file in resource.childPaths("*.vm")) {
-			vmFiles = vmFiles.append([file.string]);
+		variable String[] filterFiles = [];
+		for (file in resource.childPaths("*." + fileType)) {
+			filterFiles = filterFiles.append([file.string]);
 		}
-		return vmFiles;
+		return filterFiles;
 	}
 	// return single file
 	else if (is File resource) {

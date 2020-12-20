@@ -1,4 +1,4 @@
-// VM Translator
+// Jack Translator
 // Jonah Lawrence
 // Daniel Klein
 
@@ -6,11 +6,8 @@ import files {
 	writeFile,
 	listFilesInDirectory
 }
-import parser {
-	Parser
-}
-import codewriter {
-	CodeWriter
+import tokenizer {
+	Tokenizer
 }
 import ceylon.regex {
 	Regex,
@@ -18,16 +15,12 @@ import ceylon.regex {
 	regex
 }
 
-"Run the module `vmtranslator`."
+"Run the module `jacktranslator`."
 shared void run() {
 	// get vm files from command line arguments
-	String[] paths = listFilesInDirectory(process.arguments[0] else "./", "vm");
+	String[] paths = listFilesInDirectory(process.arguments[0] else "./", "jack");
 	
 	variable String output = "";
-	CodeWriter codewriter = CodeWriter();
-	
-	output += codewriter.initializeConstants();
-	output += codewriter.sysInit();
 	
 	// translate each vm file
 	for (path in paths) {
@@ -40,15 +33,13 @@ shared void run() {
 		}
 		String filename = re.replace(path, "").replace(".vm", "");
 		// create parser
-		Parser parser = Parser(directory, filename);
+		Tokenizer tokenizer = Tokenizer(directory, filename);
 		// build output
-		output += "// Translation of ``filename``.vm" +
-				  "\n// ----------------------------------\n\n";
-		output += parser.translateVM(codewriter);
+		output += tokenizer.tokenize();
 	}
 	
 	// write output
-	String outputFile = process.arguments.last else "./resource/output.asm";
+	String outputFile = process.arguments.last else "./resource/output-tokens.xml";
 	writeFile(outputFile, output);
 	// print contents of file for debugging
 	print(output);
