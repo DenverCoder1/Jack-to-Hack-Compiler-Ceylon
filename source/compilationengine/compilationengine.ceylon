@@ -13,8 +13,9 @@ import ceylon.regex {
 
 shared class CompilationEngine {
 	String[] tokens;
-	variable Integer index = 1;
 	variable String compilation = "";
+	variable Integer index = 1;
+	variable Integer indentLevel = 0;
 	
 	// Create a new compilation engine
 	shared new (String dir, String file) {
@@ -23,13 +24,16 @@ shared class CompilationEngine {
 	}
 	
 	shared String compile() {
-		value [type, token] = getNextToken();
-		if (token == "class") {
+		if (getNextToken()[1] == "class") {
 			compileClass();
+		}
+		else {
+			compilationError("Expected 'class' at start of program");
 		}
 		return compilation;
 	}
 	
+	// get type and value from token as string from xml
 	[String, String] getToken(String? tokenString) {
 		if (exists tokenString) {
 			Regex re = regex("<(.*?)>\\s?(.*?)\\s?</(.*?)>");
@@ -46,15 +50,32 @@ shared class CompilationEngine {
 		return ["", ""];
 	}
 	
+	// get type and value for current token
 	[String, String] getNextToken() {
 		return getToken(tokens[index]);
 	}
 	
+	// get type and value for token after current token
 	[String, String] getLookAheadToken() {
 		return getToken(tokens[index+1]);
 	}
 	
+	// add string/label to output
+	void writeString(String str) {
+		compilation += " ".repeat(indentLevel);
+		compilation += str;
+		compilation += "\n";
+	}
+	
+	// add token to output
+	void writeNextToken() {
+		if (exists token = tokens[index++]) {
+			writeString(token);
+		}
+	}
+	
 	void compilationError(String message) {
+		// context for debugging
 		print(tokens[index - 3]);
 		print(tokens[index - 2]);
 		print(tokens[index - 1]);
@@ -62,663 +83,520 @@ shared class CompilationEngine {
 		print(tokens[index + 1]);
 		print(tokens[index + 2]);
 		print("");
+		// throw exception
 		throw Exception(message);
 	}
 	
 	// Compiles a complete class
 	void compileClass() {
-		compilation += "<class>\n";
+		writeString("<class>");
+		indentLevel += 2;
 		// add class keyword
-		compilation += tokens[index++] else "" + "\n";
+		writeNextToken();
 		// add className identifier
-		if (exists type = getNextToken()[0]) {
-			if (type == "identifier") {
-				compilation += tokens[index++] else "" + "\n";
-			}
-			else {
-				compilationError("Class name must be an identifier");
-			}
+		if (getNextToken()[0] == "identifier") {
+			writeNextToken();
+		}
+		else {
+			compilationError("Class name must be an identifier");
 		}
 		// add '{' symbol
-		if (exists token = getNextToken()[1]) {
-			if (token == "{") {
-				compilation += tokens[index++] else "" + "\n";
-			}
-			else {
-				compilationError("Expected '{' after class name");
-			}
+		if (getNextToken()[1] == "{") {
+			writeNextToken();
+		}
+		else {
+			compilationError("Expected '{' after class name");
 		}
 		// add class variable declarations
-		while (true) {
-			if (exists token = getNextToken()[1]) {
-				if (token == "static" || token == "field") {
-					compileClassVarDec();
-				}
-				else {
-					break;
-				}
-			}
+		while (getNextToken()[1] in ["static", "field"]) {
+			compileClassVarDec();
 		}
 		// add subroutine declaration
-		while (true) {
-			if (exists token = getNextToken()[1]) {
-				if (token in ["constructor", "function", "method"]) {
-					compileSubroutineDec();
-				}
-				else {
-					break;
-				}
-			}
+		while (getNextToken()[1] in ["constructor", "function", "method"]) {
+			compileSubroutineDec();
 		}
 		// add '}' symbol
-		if (exists token = getNextToken()[1]) {
-			if (token == "}") {
-				compilation += tokens[index++] else "" + "\n";
-			}
-			else {
-				compilationError("Expected '}' after class");
-			}
+		if (getNextToken()[1] == "}") {
+			writeNextToken();
 		}
-		compilation += "</class>\n";
+		else {
+			compilationError("Expected '}' after class");
+		}
+		indentLevel -= 2;
+		compilation += "</class>";
 	}
 	
 	// Compiles a static variable declaration,
 	// or a field declaration
 	void compileClassVarDec() {
-		compilation += "<classVarDec>\n";
+		writeString("<classVarDec>");
+		indentLevel += 2;
 		// add static/field keyword
-		compilation += tokens[index++] else "" + "\n";
+		writeNextToken();
 		// add type
-		if (exists token = getNextToken()[1]) {
-			if (token in ["int", "char", "boolean"]) {
-				compilation += tokens[index++] else "" + "\n";
-			}			
-			else if (exists type = getNextToken()[0]) {
-				if (type == "identifier") {
-					compilation += tokens[index++] else "" + "\n";
-				}
-			}
-			else {
-				compilationError("Invalid type in class variable declaration");
-			}
+		if (getNextToken()[1] in ["int", "char", "boolean"] || getNextToken()[0] == "identifier") {
+			writeNextToken();
+		}
+		else {
+			compilationError("Invalid type in class variable declaration");
 		}
 		// add varName
-		if (exists type = getNextToken()[0]) {
-			if (type == "identifier") {
-				compilation += tokens[index++] else "" + "\n";
+		if (getNextToken()[0] == "identifier") {
+			writeNextToken();
+		}
+		else {
+			compilationError("Variable name must be an identifier");
+		}
+		// add additional variables
+		while (getNextToken()[1] == ",") {
+			writeNextToken();
+			// add varName
+			if (getNextToken()[0] == "identifier") {
+				writeNextToken();
 			}
 			else {
 				compilationError("Variable name must be an identifier");
 			}
 		}
-		// add additional variables
-		while (true) {
-			if (exists token = getNextToken()[1]) {
-				if (token == ",") {
-					compilation += tokens[index++] else "" + "\n";
-					// add varName
-					if (exists type = getNextToken()[0]) {
-						if (type == "identifier") {
-							compilation += tokens[index++] else "" + "\n";
-						}
-						else {
-							compilationError("Variable name must be an identifier");
-						}
-					}
-				}
-				else {
-					break;
-				}
-			}
-		}
 		// add semicolon
-		if (exists token = getNextToken()[1]) {
-			if (token == ";") {
-				compilation += tokens[index++] else "" + "\n";
-			}
-			else {
-				compilationError("Expected ';' after class variable declaration");
-			}
+		if (getNextToken()[1] == ";") {
+			writeNextToken();
 		}
-		compilation += "</classVarDec>\n";
+		else {
+			compilationError("Expected ';' after class variable declaration");
+		}
+		indentLevel -= 2;
+		writeString("</classVarDec>");
 	}
 	
 	// Compiles a complete method, function,
 	// method, or constructor
 	void compileSubroutineDec() {
-		compilation += "<subroutineDec>\n";
+		writeString("<subroutineDec>");
+		indentLevel += 2;
 		// add method type keyword
-		compilation += tokens[index++] else "" + "\n";
+		writeNextToken();
 		// add return type
-		if (exists token = getNextToken()[1]) {
-			if (token in ["void", "int", "char", "boolean"]) {
-				compilation += tokens[index++] else "" + "\n";
-			}			
-			else if (exists type = getNextToken()[0]) {
-				if (type == "identifier") {
-					compilation += tokens[index++] else "" + "\n";
-				}
-			}
-			else {
-				compilationError("Invalid type in subroutine declaration");
-			}
+		if (getNextToken()[1] in ["void", "int", "char", "boolean"] || getNextToken()[0] == "identifier") {
+			writeNextToken();
+		}
+		else {
+			compilationError("Invalid type in subroutine declaration");
 		}
 		// add subroutine name
-		if (exists type = getNextToken()[0]) {
-			if (type == "identifier") {
-				compilation += tokens[index++] else "" + "\n";
-			}
-			else {
-				compilationError("Subroutine name must be an identifier");
-			}
+		if (getNextToken()[0] == "identifier") {
+			writeNextToken();
+		}
+		else {
+			compilationError("Subroutine name must be an identifier");
 		}
 		// add '('
-		if (exists token = getNextToken()[1]) {
-			if (token == "(") {
-				compilation += tokens[index++] else "" + "\n";
-			}
-			else {
-				compilationError("Expected '(' after class variable declaration");
-			}
+		if (getNextToken()[1] == "(") {
+			writeNextToken();
+		}
+		else {
+			compilationError("Expected '(' after class variable declaration");
 		}
 		// add parameter list
 		compileParameterList();
 		// add ')'
-		if (exists token = getNextToken()[1]) {
-			if (token == ")") {
-				compilation += tokens[index++] else "" + "\n";
-			}
-			else {
-				compilationError("Expected ')' after class variable declaration");
-			}
+		if (getNextToken()[1] == ")") {
+			writeNextToken();
+		}
+		else {
+			compilationError("Expected ')' after class variable declaration");
 		}
 		// add subroutine body
 		compileSubroutineBody();
 		// add return type
-		compilation += "</subroutineDec>\n";
+		indentLevel -= 2;
+		writeString("</subroutineDec>");
 	}
 	
 	// Compiles a (possibly empty) parameter list.
 	// Does not handle the enclosing "()"
 	void compileParameterList() {
-		compilation += "<parameterList>\n";
-		// check if empty parameter list
-		if (exists token = getNextToken()[1]) {
-			if (token == ")") {
-				// skip parameter list
-				compilation += "</parameterList>\n";
-				return;
-			}
-		}
-		// non-empty parameter list
-		// add type
-		if (exists token = getNextToken()[1]) {
-			if (token in ["int", "char", "boolean"]) {
-				compilation += tokens[index++] else "" + "\n";
+		writeString("<parameterList>");
+		indentLevel += 2;
+		// check if empty parameter -- skip if empty
+		if (getNextToken()[1] != ")") {
+			// non-empty parameter list
+			// add type
+			if (getNextToken()[1] in ["int", "char", "boolean"] || getNextToken()[0] == "identifier") {
+				writeNextToken();
 			}			
-			else if (exists type = getNextToken()[0]) {
-				if (type == "identifier") {
-					compilation += tokens[index++] else "" + "\n";
-				}
-			}
 			else {
 				compilationError("Invalid type in parameter list");
 			}
-		}
-		// add varName
-		if (exists type = getNextToken()[0]) {
-			if (type == "identifier") {
-				compilation += tokens[index++] else "" + "\n";
+			// add varName
+			if (getNextToken()[0] == "identifier") {
+				writeNextToken();
 			}
 			else {
 				compilationError("Variable name must be an identifier");
 			}
-		}
-		// add additional variables
-		while (true) {
-			if (exists token = getNextToken()[1]) {
-				if (token == ",") {
-					compilation += tokens[index++] else "" + "\n";
-					// add type
-					if (exists token2 = getNextToken()[1]) {
-						if (token2 in ["int", "char", "boolean"]) {
-							compilation += tokens[index++] else "" + "\n";
-						}			
-						else if (exists type2 = getNextToken()[0]) {
-							if (type2 == "identifier") {
-								compilation += tokens[index++] else "" + "\n";
-							}
-						}
-						else {
-							compilationError("Invalid type in parameter list");
-						}
-					}
-					// add varName
-					if (exists type = getNextToken()[0]) {
-						if (type == "identifier") {
-							compilation += tokens[index++] else "" + "\n";
-						}
-						else {
-							compilationError("Variable name must be an identifier");
-						}
-					}
+			// add additional variables
+			while (getNextToken()[1] == ",") {
+				writeNextToken();
+				// add type
+				if (getNextToken()[1] in ["int", "char", "boolean"] || getNextToken()[0] == "identifier") {
+					writeNextToken();
 				}
 				else {
-					break;
+					compilationError("Invalid type in parameter list");
+				}
+				// add varName
+				if (getNextToken()[0] == "identifier") {
+					writeNextToken();
+				}
+				else {
+					compilationError("Variable name must be an identifier");
 				}
 			}
 		}
-		compilation += "</parameterList>\n";
+		indentLevel -= 2;
+		writeString("</parameterList>");
 	}
 	
 	// Compiles a subroutine's body
 	void compileSubroutineBody() {
-		compilation += "<subroutineBody>\n";
+		writeString("<subroutineBody>");
+		indentLevel += 2;
 		// add '{'
-		if (exists token = getNextToken()[1]) {
-			if (token == "{") {
-				compilation += tokens[index++] else "" + "\n";
-			}
-			else {
-				compilationError("Expected '(' after class variable declaration");
-			}
+		if (getNextToken()[1] == "{") {
+			writeNextToken();
+		}
+		else {
+			compilationError("Expected '(' after class variable declaration");
 		}
 		// add any variable declarations
-		while (true) {
-			if (exists token = getNextToken()[1]) {
-				if (token == "var") {
-					compileVarDec();
-				}
-				else {
-					break;
-				}
-			}
+		while (getNextToken()[1] == "var") {
+			compileVarDec();
 		}
 		// add statements
 		compileStatements();
 		// add '}'
-		if (exists token = getNextToken()[1]) {
-			if (token == "}") {
-				compilation += tokens[index++] else "" + "\n";
-			}
-			else {
-				compilationError("Expected '(' after class variable declaration");
-			}
+		if (getNextToken()[1] == "}") {
+			writeNextToken();
 		}
-		compilation += "</subroutineBody>\n";
+		else {
+			compilationError("Expected '(' after class variable declaration");
+		}
+		indentLevel -= 2;
+		writeString("</subroutineBody>");
 	}
 	
 	// Compiles a var declaration
 	void compileVarDec() {
-		compilation += "<varDec>";
+		writeString("<varDec>");
+		indentLevel += 2;
 		// add var keyword
-		compilation += tokens[index++] else "" + "\n";
+		writeNextToken();
 		// add type
-		if (exists token = getNextToken()[1]) {
-			if (token in ["int", "char", "boolean"]) {
-				compilation += tokens[index++] else "" + "\n";
-			}			
-			else if (exists type = getNextToken()[0]) {
-				if (type == "identifier") {
-					compilation += tokens[index++] else "" + "\n";
-				}
-			}
-			else {
-				compilationError("Invalid type in variable declaration");
-			}
+		if (getNextToken()[1] in ["int", "char", "boolean"] || getNextToken()[0] == "identifier") {
+			writeNextToken();
+		}
+		else {
+			compilationError("Invalid type in variable declaration");
 		}
 		// add varName
-		if (exists type = getNextToken()[0]) {
-			if (type == "identifier") {
-				compilation += tokens[index++] else "" + "\n";
+		if (getNextToken()[0] == "identifier") {
+			writeNextToken();
+		}
+		else {
+			compilationError("Variable name must be an identifier");
+		}
+		// add additional variables
+		while (getNextToken()[1] == ",") {
+			writeNextToken();
+			// add varName
+			if (getNextToken()[0] == "identifier") {
+				writeNextToken();
 			}
 			else {
 				compilationError("Variable name must be an identifier");
 			}
 		}
-		// add additional variables
-		while (true) {
-			if (exists token = getNextToken()[1]) {
-				if (token == ",") {
-					compilation += tokens[index++] else "" + "\n";
-					// add varName
-					if (exists type = getNextToken()[0]) {
-						if (type == "identifier") {
-							compilation += tokens[index++] else "" + "\n";
-						}
-						else {
-							compilationError("Variable name must be an identifier");
-						}
-					}
-				}
-				else {
-					break;
-				}
-			}
-		}
 		// add semicolon
-		if (exists token = getNextToken()[1]) {
-			if (token == ";") {
-				compilation += tokens[index++] else "" + "\n";
-			}
-			else {
-				compilationError("Expected ';' after class");
-			}
+		if (getNextToken()[1] == ";") {
+			writeNextToken();
 		}
-		compilation += "</varDec>";
+		else {
+			compilationError("Expected ';' after class");
+		}
+		indentLevel -= 2;
+		writeString("</varDec>");
 	}
 	
 	// Compiles a sequence of statements
 	// Does not handle enclosing "{}"
 	void compileStatements() {
-		compilation += "<statements>\n";
+		writeString("<statements>");
+		indentLevel += 2;
 		while (true) {
-			if (exists token = getNextToken()[1]) {
-				if (token == "if") {
-					compileIf();
-				}
-				else if (token == "let") {
-					compileLet();
-				}
-				else if (token == "while") {
-					compileWhile();
-				}
-				else if (token == "do") {
-					compileDo();
-				}
-				else if (token == "return") {
-					compileReturn();
-				}
-				else {
-					break;
-				}
+			value token = getNextToken()[1];
+			if (token == "if") {
+				compileIf();
+			}
+			else if (token == "let") {
+				compileLet();
+			}
+			else if (token == "while") {
+				compileWhile();
+			}
+			else if (token == "do") {
+				compileDo();
+			}
+			else if (token == "return") {
+				compileReturn();
+			}
+			else {
+				break;
 			}
 		}
-		compilation += "</statements>\n";
+		indentLevel -= 2;
+		writeString("</statements>");
 	}
 	
 	// Compiles a let
 	void compileLet() {
-		compilation += "<letStatement>\n";
+		writeString("<letStatement>");
+		indentLevel += 2;
 		// add let keyword
-		compilation += tokens[index++] else "" + "\n";
+		writeNextToken();
 		// add var name
-		if (exists type = getNextToken()[0]) {
-			if (type == "identifier") {
-				compilation += tokens[index++] else "" + "\n";
-			}
-			else {
-				compilationError("Variable name must be an identifier");
-			}
+		if (getNextToken()[0] == "identifier") {
+			writeNextToken();
+		}
+		else {
+			compilationError("Variable name must be an identifier");
 		}
 		// add optionally, '[' expression ']'
-		if (exists token = getNextToken()[1]) {
-			if (token == "[") {
-				compilation += tokens[index++] else "" + "\n";
-				// add expression
-				compileExpression();
-				// add ']'
-				if (exists token2 = getNextToken()[1]) {
-					if (token2 == "]") {
-						compilation += tokens[index++] else "" + "\n";						
-					}
-					else {
-						compilationError("Expected ']' in let statement");
-					}
-				}
+		if (getNextToken()[1] == "[") {
+			writeNextToken();
+			// add expression
+			compileExpression();
+			// add ']'
+			if (getNextToken()[1] == "]") {
+				writeNextToken();						
+			}
+			else {
+				compilationError("Expected ']' in let statement");
 			}
 		}
 		// add equals sign
-		if (exists token = getNextToken()[1]) {
-			if (token == "=") {
-				compilation += tokens[index++] else "" + "\n";						
-			}
-			else {
-				compilationError("Expected '=' in let statement");
-			}
+		if (getNextToken()[1] == "=") {
+			writeNextToken();						
+		}
+		else {
+			compilationError("Expected '=' in let statement");
 		}
 		// add expression
 		compileExpression();
 		// add semicolon
-		if (exists token = getNextToken()[1]) {
-			if (token == ";") {
-				compilation += tokens[index++] else "" + "\n";						
-			}
-			else {
-				compilationError("Expected ';' in let statement");
-			}
+		if (getNextToken()[1] == ";") {
+			writeNextToken();						
 		}
-		compilation += "</letStatement>\n";
+		else {
+			compilationError("Expected ';' in let statement");
+		}
+		indentLevel -= 2;
+		writeString("</letStatement>");
 	}
 	
 	// Compiles an if statement (possibly w/ else)
 	void compileIf() {
-		compilation += "<ifStatement>\n";
+		writeString("<ifStatement>");
+		indentLevel += 2;
 		// add if keyword
-		compilation += tokens[index++] else "" + "\n";
+		writeNextToken();
 		// add '('
-		if (exists token = getNextToken()[1]) {
-			if (token == "(") {
-				compilation += tokens[index++] else "" + "\n";						
-			}
-			else {
-				compilationError("Expected '(' in if statement condition");
-			}
+		if (getNextToken()[1] == "(") {
+			writeNextToken();						
+		}
+		else {
+			compilationError("Expected '(' in if statement condition");
 		}
 		// add expression
 		compileExpression();
 		// add ')'
-		if (exists token = getNextToken()[1]) {
-			if (token == ")") {
-				compilation += tokens[index++] else "" + "\n";						
-			}
-			else {
-				compilationError("Expected ')' in if statement condition");
-			}
+		if (getNextToken()[1] == ")") {
+			writeNextToken();						
+		}
+		else {
+			compilationError("Expected ')' in if statement condition");
 		}
 		// add '{'
-		if (exists token = getNextToken()[1]) {
-			if (token == "{") {
-				compilation += tokens[index++] else "" + "\n";						
-			}
-			else {
-				compilationError("Expected '{' in if statement body");
-			}
+		if (getNextToken()[1] == "{") {
+			writeNextToken();						
+		}
+		else {
+			compilationError("Expected '{' in if statement body");
 		}
 		// add statements
 		compileStatements();
 		// add '}'
-		if (exists token = getNextToken()[1]) {
-			if (token == "}") {
-				compilation += tokens[index++] else "" + "\n";						
-			}
-			else {
-				compilationError("Expected '}' in if statement body");
-			}
+		if (getNextToken()[1] == "}") {
+			writeNextToken();						
+		}
+		else {
+			compilationError("Expected '}' in if statement body");
 		}
 		// optional else
-		if (exists token = getNextToken()[1]) {
-			if (token == "else") {
-				// add else keyword
-				compilation += tokens[index++] else "" + "\n";
-				// add '{'
-				if (exists token2 = getNextToken()[1]) {
-					if (token2 == "{") {
-						compilation += tokens[index++] else "" + "\n";						
-					}
-					else {
-						compilationError("Expected '{' in else statement body");
-					}
-				}
-				// add statements
-				compileStatements();
-				// add '}'
-				if (exists token3 = getNextToken()[1]) {
-					if (token3 == "}") {
-						compilation += tokens[index++] else "" + "\n";						
-					}
-					else {
-						compilationError("Expected '}' in else statement body");
-					}
-				}
+		if (getNextToken()[1] == "else") {
+			// add else keyword
+			writeNextToken();
+			// add '{'
+			if (getNextToken()[1] == "{") {
+				writeNextToken();						
+			}
+			else {
+				compilationError("Expected '{' in else statement body");
+			}
+			// add statements
+			compileStatements();
+			// add '}'
+			if (getNextToken()[1] == "}") {
+				writeNextToken();						
+			}
+			else {
+				compilationError("Expected '}' in else statement body");
 			}
 		}
-		compilation += "</ifStatement>\n";
+		indentLevel -= 2;
+		writeString("</ifStatement>");
 	}
 	
 	// Compiles a while
 	void compileWhile() {
-		compilation += "<whileStatement>\n";
+		writeString("<whileStatement>");
+		indentLevel += 2;
 		// add while keyword
-		compilation += tokens[index++] else "" + "\n";
+		writeNextToken();
 		// add '('
-		if (exists token = getNextToken()[1]) {
-			if (token == "(") {
-				compilation += tokens[index++] else "" + "\n";						
-			}
-			else {
-				compilationError("Expected '(' in while statement");
-			}
+		if (getNextToken()[1] == "(") {
+			writeNextToken();						
+		}
+		else {
+			compilationError("Expected '(' in while statement");
 		}
 		// add expression
 		compileExpression();
 		// add ')'
-		if (exists token = getNextToken()[1]) {
-			if (token == ")") {
-				compilation += tokens[index++] else "" + "\n";						
-			}
-			else {
-				compilationError("Expected ')' in while statement");
-			}
+		if (getNextToken()[1] == ")") {
+			writeNextToken();						
+		}
+		else {
+			compilationError("Expected ')' in while statement");
 		}
 		// add '{'
-		if (exists token = getNextToken()[1]) {
-			if (token == "{") {
-				compilation += tokens[index++] else "" + "\n";						
-			}
-			else {
-				compilationError("Expected '{' in while statement");
-			}
+		if (getNextToken()[1] == "{") {
+			writeNextToken();						
+		}
+		else {
+			compilationError("Expected '{' in while statement");
 		}
 		// add statements
 		compileStatements();
 		// add '}'
-		if (exists token = getNextToken()[1]) {
-			if (token == "}") {
-				compilation += tokens[index++] else "" + "\n";						
-			}
-			else {
-				compilationError("Expected '}' in while statement");
-			}
+		if (getNextToken()[1] == "}") {
+			writeNextToken();						
 		}
-		compilation += "</whileStatement>\n";
+		else {
+			compilationError("Expected '}' in while statement");
+		}
+		indentLevel -= 2;
+		writeString("</whileStatement>");
 	}
 	
 	// Compiles a do statement
 	void compileDo() {
-		compilation += "<doStatement>\n";
+		writeString("<doStatement>");
+		indentLevel += 2;
 		// add do statement
-		compilation += tokens[index++] else "" + "\n";
+		writeNextToken();
 		// add subroutine call --
 		// add identifier
-		if (exists type = getNextToken()[0]) {
-			if (type == "identifier") {
-				compilation += tokens[index++] else "" + "\n";						
-			}
-			else {
-				compilationError("Expected identifier in do statement");
-			}
+		if (getNextToken()[0] == "identifier") {
+			writeNextToken();						
+		}
+		else {
+			compilationError("Expected identifier in do statement");
 		}
 		// add optional dot and identifier
-		if (exists token = getNextToken()[1]) {
-			if (token == ".") {
-				// add '.'
-				compilation += tokens[index++] else "" + "\n";
-				// add subroutine name
-				if (exists type = getNextToken()[0]) {
-					if (type == "identifier") {
-						compilation += tokens[index++] else "" + "\n";						
-					}
-					else {
-						compilationError("Expected identifier in do statement after '.'");
-					}
-				}						
-			}
-		}
-		// add '('
-		if (exists token = getNextToken()[1]) {
-			if (token == "(") {
-				compilation += tokens[index++] else "" + "\n";						
+		if (getNextToken()[1] == ".") {
+			// add '.'
+			writeNextToken();
+			// add subroutine name
+			if (getNextToken()[0] == "identifier") {
+				writeNextToken();						
 			}
 			else {
-				compilationError("Expected '(' in do statement");
-			}
+				compilationError("Expected identifier in do statement after '.'");
+			}						
+		}
+		// add '('
+		if (getNextToken()[1] == "(") {
+			writeNextToken();						
+		}
+		else {
+			compilationError("Expected '(' in do statement");
 		}
 		// add expression list
 		compileExpressionList();
 		// add ')'
-		if (exists token = getNextToken()[1]) {
-			if (token == ")") {
-				compilation += tokens[index++] else "" + "\n";						
-			}
-			else {
-				compilationError("Expected ')' in do statement");
-			}
+		if (getNextToken()[1] == ")") {
+			writeNextToken();						
+		}
+		else {
+			compilationError("Expected ')' in do statement");
 		}
 		// add semicolon
-		if (exists token = getNextToken()[1]) {
-			if (token == ";") {
-				compilation += tokens[index++] else "" + "\n";						
-			}
-			else {
-				compilationError("Expected ';' in do statement");
-			}
+		if (getNextToken()[1] == ";") {
+			writeNextToken();						
 		}
-		compilation += "</doStatement>\n";
+		else {
+			compilationError("Expected ';' in do statement");
+		}
+		indentLevel -= 2;
+		writeString("</doStatement>");
 	}
 	
 	// Compiles a return
 	void compileReturn() {
-		compilation += "<returnStatement>\n";
+		writeString("<returnStatement>");
+		indentLevel += 2;
 		// add return keyword
-		compilation += tokens[index++] else "" + "\n";
+		writeNextToken();
 		// add optional expression
-		if (exists token = getNextToken()[1]) {
-			// next token is not a semicolon
-			if (token != ";") {
-				compileExpression();						
-			}
+		// next token is not a semicolon
+		if (getNextToken()[1] != ";") {
+			compileExpression();						
 		}
 		// add semicolon
-		if (exists token = getNextToken()[1]) {
-			if (token == ";") {
-				compilation += tokens[index++] else "" + "\n";						
-			}
-			else {
-				compilationError("Expected ';' in do statement");
-			}
+		if (getNextToken()[1] == ";") {
+			writeNextToken();						
 		}
-		compilation += "</returnStatement>\n";
+		else {
+			compilationError("Expected ';' in do statement");
+		}
+		indentLevel -= 2;
+		writeString("</returnStatement>");
 	}
 	
 	// Compile an expression
 	void compileExpression() {
-		compilation += "<expression>\n";
+		writeString("<expression>");
+		indentLevel += 2;
 		compileTerm();
-		while (true) {
-			if (exists token = getNextToken()[1]) {
-				if (token in ["+","-","*","/","&amp;","|","&lt;","&gt;","="]) {
-					// add op
-					compilation += tokens[index++] else "" + "\n";
-					// add term
-					compileTerm();
-				}
-				else {
-					break;
-				}
-			}
+		while (getNextToken()[1] in ["+","-","*","/","&amp;","|","&lt;","&gt;","="]) {
+			// add op
+			writeNextToken();
+			// add term
+			compileTerm();
 		}
-		compilation += "</expression>\n";
+		indentLevel -= 2;
+		writeString("</expression>");
 	}
 	
 	// Compiles a term
@@ -739,30 +617,30 @@ shared class CompilationEngine {
 		if (!isTerm(type, token)) {
 			compilationError("Expected a term");
 		}
-		compilation += "<term>\n";
+		writeString("<term>");
+		indentLevel += 2;
 		// if unary op, add it an then compile a term
 		if (token in ["-", "~"]) {
-			compilation += tokens[index++] else "" + "\n";
+			writeNextToken();
 			compileTerm();
 		}
 		// if keyword term, add it as the term
 		else if (token in ["true", "false", "null", "this"]) {
-			compilation += tokens[index++] else "" + "\n";
+			writeNextToken();
 		}
 		// if int const or string const, add it as the term
 		else if (type in ["integerConstant", "stringConstant"]) {
-			compilation += tokens[index++] else "" + "\n";
+			writeNextToken();
 		}
 		// if expression in parenthesis, add it
 		else if (token == "(") {
 			// write '('
-			compilation += tokens[index++] else "" + "\n";
+			writeNextToken();
 			// add expression
 			compileExpression();
 			// write ')'
-			value [type2, token2] = getNextToken();
-			if (token2 == ")") {
-				compilation += tokens[index++] else "" + "\n";
+			if (getNextToken()[1] == ")") {
+				writeNextToken();
 			}
 			else {
 				compilationError("Expected ')' in term");
@@ -770,21 +648,19 @@ shared class CompilationEngine {
 		}
 		// check next token
 		else {
-			value [lookAheadType, lookAheadToken] = getLookAheadToken();
+			String lookAheadToken = getLookAheadToken()[1];
 			// add array access
 			if (lookAheadToken == "[") {
-				value [type2, token2] = getNextToken();
-				if (type2 == "identifier") {
+				if (getNextToken()[0] == "identifier") {
 					// add identifier
-					compilation += tokens[index++] else "" + "\n";
+					writeNextToken();
 					// add '['
-					compilation += tokens[index++] else "" + "\n";
+					writeNextToken();
 					// add expression
 					compileExpression();
 					// add ']'
-					value [type3, token3] = getNextToken();
-					if (token3 == "]") {
-						compilation += tokens[index++] else "" + "\n";
+					if (getNextToken()[1] == "]") {
+						writeNextToken();
 					}
 					else {
 						compilationError("Expected ']' in expression");
@@ -797,31 +673,27 @@ shared class CompilationEngine {
 			// add subroutine call
 			else if (lookAheadToken in ["(", "."]) {
 				// add identifier
-				value [type2, token2] = getNextToken();
-				if (type2 == "identifier") {
-					compilation += tokens[index++] else "" + "\n";						
+				if (getNextToken()[0] == "identifier") {
+					writeNextToken();						
 				}
 				else {
 					compilationError("Expected identifier in term as class name or subroutine");
 				}
 				// add optional dot and identifier
-				value [type3, token3] = getNextToken();
-				if (token3 == ".") {
+				if (getNextToken()[1] == ".") {
 					// add '.'
-					compilation += tokens[index++] else "" + "\n";
+					writeNextToken();
 					// add subroutine name
-					value [type4, token4] = getNextToken();
-					if (type4 == "identifier") {
-						compilation += tokens[index++] else "" + "\n";						
+					if (getNextToken()[0] == "identifier") {
+						writeNextToken();						
 					}
 					else {
-						compilationError("Expected subroutine name in term");
+						compilationError("Expected valid subroutine name in term");
 					}					
 				}
 				// add '('
-				value [type5, token5] = getNextToken();
-				if (token5 == "(") {
-					compilation += tokens[index++] else "" + "\n";						
+				if (getNextToken()[1] == "(") {
+					writeNextToken();						
 				}
 				else {
 					compilationError("Expected '(' in term");
@@ -829,9 +701,8 @@ shared class CompilationEngine {
 				// add expression list
 				compileExpressionList();
 				// add ')'
-				value [type6, token6] = getNextToken();
-				if (token6 == ")") {
-					compilation += tokens[index++] else "" + "\n";						
+				if (getNextToken()[1] == ")") {
+					writeNextToken();						
 				}
 				else {
 					compilationError("Expected ')' in term");
@@ -839,41 +710,36 @@ shared class CompilationEngine {
 			}
 			// add identifier
 			else {
-				value [type2, token2] = getNextToken();
-				if (type2 == "identifier") {
-					compilation += tokens[index++] else "" + "\n";						
+				if (getNextToken()[0] == "identifier") {
+					writeNextToken();						
 				}
 				else {
 					compilationError("Expected identifier in term");
 				}
 			}
 		}
-		compilation += "</term>\n";
+		indentLevel -= 2;
+		writeString("</term>");
 	}
 	
 	// Compiles a (possibly empty) comma separated
 	// list of expressions
 	void compileExpressionList() {
-		compilation += "<expressionList>\n";
+		writeString("<expressionList>");
+		indentLevel += 2;
 		// optional expression list
-		value [type, token] = getNextToken();
-		if (token != ")") {
+		if (getNextToken()[1] != ")") {
 			// add expression
 			compileExpression();
 			// check for additional expressions
-			while (true) {
-				value [type2, token2] = getNextToken();
-				if (token2 != ",") {
-					break;
-				}
-				else {
-					// add ','
-					compilation += tokens[index++] else "" + "\n";
-					// add expression
-					compileExpression();
-				}
+			while (getNextToken()[1] == ",") {
+				// add ','
+				writeNextToken();
+				// add expression
+				compileExpression();
 			}
 		}
-		compilation += "</expressionList>\n";
+		indentLevel -= 2;
+		writeString("</expressionList>");
 	}
 }
