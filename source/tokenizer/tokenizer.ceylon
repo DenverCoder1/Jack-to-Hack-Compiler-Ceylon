@@ -16,7 +16,7 @@ shared class Tokenizer {
 	
 	shared new (String dir, String file) {
 		// Open .jack file for tokenization
-		input = readFile(dir + file);
+		input = readFile(dir + file + ".jack");
 	}
 	
 	// remove comments and spaces on ends
