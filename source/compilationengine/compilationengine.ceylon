@@ -23,15 +23,14 @@ shared class CompilationEngine {
 	}
 	
 	shared String compile() {
-		if (exists token = getNextToken()[1]) {
-			if (token == "class") {
-				compileClass();
-			}
+		value [type, token] = getNextToken();
+		if (token == "class") {
+			compileClass();
 		}
 		return compilation;
 	}
 	
-	String[] getToken(String? tokenString) {
+	[String, String] getToken(String? tokenString) {
 		if (exists tokenString) {
 			Regex re = regex("<(.*?)>\\s?(.*?)\\s?</(.*?)>");
 			String type;
@@ -47,8 +46,23 @@ shared class CompilationEngine {
 		return ["", ""];
 	}
 	
-	String[] getNextToken() {
+	[String, String] getNextToken() {
 		return getToken(tokens[index]);
+	}
+	
+	[String, String] getLookAheadToken() {
+		return getToken(tokens[index+1]);
+	}
+	
+	void compilationError(String message) {
+		print(tokens[index - 3]);
+		print(tokens[index - 2]);
+		print(tokens[index - 1]);
+		print("---> " + (tokens[index] else "") + " <---");
+		print(tokens[index + 1]);
+		print(tokens[index + 2]);
+		print("");
+		throw Exception(message);
 	}
 	
 	// Compiles a complete class
@@ -62,7 +76,7 @@ shared class CompilationEngine {
 				compilation += tokens[index++] else "" + "\n";
 			}
 			else {
-				throw Exception("Class name must be an identifier");
+				compilationError("Class name must be an identifier");
 			}
 		}
 		// add '{' symbol
@@ -71,7 +85,7 @@ shared class CompilationEngine {
 				compilation += tokens[index++] else "" + "\n";
 			}
 			else {
-				throw Exception("Expected '{' after class name");
+				compilationError("Expected '{' after class name");
 			}
 		}
 		// add class variable declarations
@@ -102,7 +116,7 @@ shared class CompilationEngine {
 				compilation += tokens[index++] else "" + "\n";
 			}
 			else {
-				throw Exception("Expected '}' after class");
+				compilationError("Expected '}' after class");
 			}
 		}
 		compilation += "</class>\n";
@@ -125,7 +139,7 @@ shared class CompilationEngine {
 				}
 			}
 			else {
-				throw Exception("Invalid type in class variable declaration");
+				compilationError("Invalid type in class variable declaration");
 			}
 		}
 		// add varName
@@ -134,7 +148,7 @@ shared class CompilationEngine {
 				compilation += tokens[index++] else "" + "\n";
 			}
 			else {
-				throw Exception("Variable name must be an identifier");
+				compilationError("Variable name must be an identifier");
 			}
 		}
 		// add additional variables
@@ -148,7 +162,7 @@ shared class CompilationEngine {
 							compilation += tokens[index++] else "" + "\n";
 						}
 						else {
-							throw Exception("Variable name must be an identifier");
+							compilationError("Variable name must be an identifier");
 						}
 					}
 				}
@@ -163,7 +177,7 @@ shared class CompilationEngine {
 				compilation += tokens[index++] else "" + "\n";
 			}
 			else {
-				throw Exception("Expected ';' after class variable declaration");
+				compilationError("Expected ';' after class variable declaration");
 			}
 		}
 		compilation += "</classVarDec>\n";
@@ -186,7 +200,7 @@ shared class CompilationEngine {
 				}
 			}
 			else {
-				throw Exception("Invalid type in subroutine declaration");
+				compilationError("Invalid type in subroutine declaration");
 			}
 		}
 		// add subroutine name
@@ -195,7 +209,7 @@ shared class CompilationEngine {
 				compilation += tokens[index++] else "" + "\n";
 			}
 			else {
-				throw Exception("Subroutine name must be an identifier");
+				compilationError("Subroutine name must be an identifier");
 			}
 		}
 		// add '('
@@ -204,7 +218,7 @@ shared class CompilationEngine {
 				compilation += tokens[index++] else "" + "\n";
 			}
 			else {
-				throw Exception("Expected '(' after class variable declaration");
+				compilationError("Expected '(' after class variable declaration");
 			}
 		}
 		// add parameter list
@@ -215,7 +229,7 @@ shared class CompilationEngine {
 				compilation += tokens[index++] else "" + "\n";
 			}
 			else {
-				throw Exception("Expected ')' after class variable declaration");
+				compilationError("Expected ')' after class variable declaration");
 			}
 		}
 		// add subroutine body
@@ -248,7 +262,7 @@ shared class CompilationEngine {
 				}
 			}
 			else {
-				throw Exception("Invalid type in parameter list");
+				compilationError("Invalid type in parameter list");
 			}
 		}
 		// add varName
@@ -257,7 +271,7 @@ shared class CompilationEngine {
 				compilation += tokens[index++] else "" + "\n";
 			}
 			else {
-				throw Exception("Variable name must be an identifier");
+				compilationError("Variable name must be an identifier");
 			}
 		}
 		// add additional variables
@@ -265,13 +279,27 @@ shared class CompilationEngine {
 			if (exists token = getNextToken()[1]) {
 				if (token == ",") {
 					compilation += tokens[index++] else "" + "\n";
+					// add type
+					if (exists token2 = getNextToken()[1]) {
+						if (token2 in ["int", "char", "boolean"]) {
+							compilation += tokens[index++] else "" + "\n";
+						}			
+						else if (exists type2 = getNextToken()[0]) {
+							if (type2 == "identifier") {
+								compilation += tokens[index++] else "" + "\n";
+							}
+						}
+						else {
+							compilationError("Invalid type in parameter list");
+						}
+					}
 					// add varName
 					if (exists type = getNextToken()[0]) {
 						if (type == "identifier") {
 							compilation += tokens[index++] else "" + "\n";
 						}
 						else {
-							throw Exception("Variable name must be an identifier");
+							compilationError("Variable name must be an identifier");
 						}
 					}
 				}
@@ -292,7 +320,7 @@ shared class CompilationEngine {
 				compilation += tokens[index++] else "" + "\n";
 			}
 			else {
-				throw Exception("Expected '(' after class variable declaration");
+				compilationError("Expected '(' after class variable declaration");
 			}
 		}
 		// add any variable declarations
@@ -314,7 +342,7 @@ shared class CompilationEngine {
 				compilation += tokens[index++] else "" + "\n";
 			}
 			else {
-				throw Exception("Expected '(' after class variable declaration");
+				compilationError("Expected '(' after class variable declaration");
 			}
 		}
 		compilation += "</subroutineBody>\n";
@@ -336,7 +364,7 @@ shared class CompilationEngine {
 				}
 			}
 			else {
-				throw Exception("Invalid type in variable declaration");
+				compilationError("Invalid type in variable declaration");
 			}
 		}
 		// add varName
@@ -345,7 +373,7 @@ shared class CompilationEngine {
 				compilation += tokens[index++] else "" + "\n";
 			}
 			else {
-				throw Exception("Variable name must be an identifier");
+				compilationError("Variable name must be an identifier");
 			}
 		}
 		// add additional variables
@@ -359,7 +387,7 @@ shared class CompilationEngine {
 							compilation += tokens[index++] else "" + "\n";
 						}
 						else {
-							throw Exception("Variable name must be an identifier");
+							compilationError("Variable name must be an identifier");
 						}
 					}
 				}
@@ -374,7 +402,7 @@ shared class CompilationEngine {
 				compilation += tokens[index++] else "" + "\n";
 			}
 			else {
-				throw Exception("Expected ';' after class");
+				compilationError("Expected ';' after class");
 			}
 		}
 		compilation += "</varDec>";
@@ -383,7 +411,7 @@ shared class CompilationEngine {
 	// Compiles a sequence of statements
 	// Does not handle enclosing "{}"
 	void compileStatements() {
-		compilation += "<statements>";
+		compilation += "<statements>\n";
 		while (true) {
 			if (exists token = getNextToken()[1]) {
 				if (token == "if") {
@@ -406,12 +434,12 @@ shared class CompilationEngine {
 				}
 			}
 		}
-		compilation += "</statements>";
+		compilation += "</statements>\n";
 	}
 	
 	// Compiles a let
 	void compileLet() {
-		compilation += "<letStatement>";
+		compilation += "<letStatement>\n";
 		// add let keyword
 		compilation += tokens[index++] else "" + "\n";
 		// add var name
@@ -420,7 +448,7 @@ shared class CompilationEngine {
 				compilation += tokens[index++] else "" + "\n";
 			}
 			else {
-				throw Exception("Variable name must be an identifier");
+				compilationError("Variable name must be an identifier");
 			}
 		}
 		// add optionally, '[' expression ']'
@@ -435,7 +463,7 @@ shared class CompilationEngine {
 						compilation += tokens[index++] else "" + "\n";						
 					}
 					else {
-						throw Exception("Expected ']' in let statement");
+						compilationError("Expected ']' in let statement");
 					}
 				}
 			}
@@ -446,7 +474,7 @@ shared class CompilationEngine {
 				compilation += tokens[index++] else "" + "\n";						
 			}
 			else {
-				throw Exception("Expected '=' in let statement");
+				compilationError("Expected '=' in let statement");
 			}
 		}
 		// add expression
@@ -457,15 +485,15 @@ shared class CompilationEngine {
 				compilation += tokens[index++] else "" + "\n";						
 			}
 			else {
-				throw Exception("Expected ';' in let statement");
+				compilationError("Expected ';' in let statement");
 			}
 		}
-		compilation += "</letStatement>";
+		compilation += "</letStatement>\n";
 	}
 	
 	// Compiles an if statement (possibly w/ else)
 	void compileIf() {
-		compilation += "<ifStatement>";
+		compilation += "<ifStatement>\n";
 		// add if keyword
 		compilation += tokens[index++] else "" + "\n";
 		// add '('
@@ -474,7 +502,7 @@ shared class CompilationEngine {
 				compilation += tokens[index++] else "" + "\n";						
 			}
 			else {
-				throw Exception("Expected '(' in if statement condition");
+				compilationError("Expected '(' in if statement condition");
 			}
 		}
 		// add expression
@@ -485,7 +513,7 @@ shared class CompilationEngine {
 				compilation += tokens[index++] else "" + "\n";						
 			}
 			else {
-				throw Exception("Expected ')' in if statement condition");
+				compilationError("Expected ')' in if statement condition");
 			}
 		}
 		// add '{'
@@ -494,7 +522,7 @@ shared class CompilationEngine {
 				compilation += tokens[index++] else "" + "\n";						
 			}
 			else {
-				throw Exception("Expected '{' in if statement body");
+				compilationError("Expected '{' in if statement body");
 			}
 		}
 		// add statements
@@ -505,7 +533,7 @@ shared class CompilationEngine {
 				compilation += tokens[index++] else "" + "\n";						
 			}
 			else {
-				throw Exception("Expected '}' in if statement body");
+				compilationError("Expected '}' in if statement body");
 			}
 		}
 		// optional else
@@ -519,7 +547,7 @@ shared class CompilationEngine {
 						compilation += tokens[index++] else "" + "\n";						
 					}
 					else {
-						throw Exception("Expected '{' in else statement body");
+						compilationError("Expected '{' in else statement body");
 					}
 				}
 				// add statements
@@ -530,17 +558,17 @@ shared class CompilationEngine {
 						compilation += tokens[index++] else "" + "\n";						
 					}
 					else {
-						throw Exception("Expected '}' in else statement body");
+						compilationError("Expected '}' in else statement body");
 					}
 				}
 			}
 		}
-		compilation += "</ifStatement>";
+		compilation += "</ifStatement>\n";
 	}
 	
 	// Compiles a while
 	void compileWhile() {
-		compilation += "<whileStatement>";
+		compilation += "<whileStatement>\n";
 		// add while keyword
 		compilation += tokens[index++] else "" + "\n";
 		// add '('
@@ -549,7 +577,7 @@ shared class CompilationEngine {
 				compilation += tokens[index++] else "" + "\n";						
 			}
 			else {
-				throw Exception("Expected '(' in while statement");
+				compilationError("Expected '(' in while statement");
 			}
 		}
 		// add expression
@@ -560,7 +588,7 @@ shared class CompilationEngine {
 				compilation += tokens[index++] else "" + "\n";						
 			}
 			else {
-				throw Exception("Expected ')' in while statement");
+				compilationError("Expected ')' in while statement");
 			}
 		}
 		// add '{'
@@ -569,7 +597,7 @@ shared class CompilationEngine {
 				compilation += tokens[index++] else "" + "\n";						
 			}
 			else {
-				throw Exception("Expected '{' in while statement");
+				compilationError("Expected '{' in while statement");
 			}
 		}
 		// add statements
@@ -580,15 +608,15 @@ shared class CompilationEngine {
 				compilation += tokens[index++] else "" + "\n";						
 			}
 			else {
-				throw Exception("Expected '}' in while statement");
+				compilationError("Expected '}' in while statement");
 			}
 		}
-		compilation += "</whileStatement>";
+		compilation += "</whileStatement>\n";
 	}
 	
 	// Compiles a do statement
 	void compileDo() {
-		compilation += "<doStatement>";
+		compilation += "<doStatement>\n";
 		// add do statement
 		compilation += tokens[index++] else "" + "\n";
 		// add subroutine call --
@@ -598,11 +626,11 @@ shared class CompilationEngine {
 				compilation += tokens[index++] else "" + "\n";						
 			}
 			else {
-				throw Exception("Expected identifier in do statement");
+				compilationError("Expected identifier in do statement");
 			}
 		}
 		// add optional dot and identifier
-		if (exists token = getNextToken()[0]) {
+		if (exists token = getNextToken()[1]) {
 			if (token == ".") {
 				// add '.'
 				compilation += tokens[index++] else "" + "\n";
@@ -612,12 +640,9 @@ shared class CompilationEngine {
 						compilation += tokens[index++] else "" + "\n";						
 					}
 					else {
-						throw Exception("Expected identifier in do statement");
+						compilationError("Expected identifier in do statement after '.'");
 					}
 				}						
-			}
-			else {
-				throw Exception("Expected identifier in do statement");
 			}
 		}
 		// add '('
@@ -626,7 +651,7 @@ shared class CompilationEngine {
 				compilation += tokens[index++] else "" + "\n";						
 			}
 			else {
-				throw Exception("Expected '(' in do statement");
+				compilationError("Expected '(' in do statement");
 			}
 		}
 		// add expression list
@@ -637,7 +662,7 @@ shared class CompilationEngine {
 				compilation += tokens[index++] else "" + "\n";						
 			}
 			else {
-				throw Exception("Expected ')' in do statement");
+				compilationError("Expected ')' in do statement");
 			}
 		}
 		// add semicolon
@@ -646,15 +671,15 @@ shared class CompilationEngine {
 				compilation += tokens[index++] else "" + "\n";						
 			}
 			else {
-				throw Exception("Expected ';' in do statement");
+				compilationError("Expected ';' in do statement");
 			}
 		}
-		compilation += "</doStatement>";
+		compilation += "</doStatement>\n";
 	}
 	
 	// Compiles a return
 	void compileReturn() {
-		compilation += "<returnStatement>";
+		compilation += "<returnStatement>\n";
 		// add return keyword
 		compilation += tokens[index++] else "" + "\n";
 		// add optional expression
@@ -670,15 +695,15 @@ shared class CompilationEngine {
 				compilation += tokens[index++] else "" + "\n";						
 			}
 			else {
-				throw Exception("Expected ';' in do statement");
+				compilationError("Expected ';' in do statement");
 			}
 		}
-		compilation += "</returnStatement>";
+		compilation += "</returnStatement>\n";
 	}
 	
 	// Compile an expression
 	void compileExpression() {
-		compilation += "<expression>";
+		compilation += "<expression>\n";
 		compileTerm();
 		while (true) {
 			if (exists token = getNextToken()[1]) {
@@ -693,7 +718,7 @@ shared class CompilationEngine {
 				}
 			}
 		}
-		compilation += "</expression>";
+		compilation += "</expression>\n";
 	}
 	
 	// Compiles a term
@@ -703,26 +728,152 @@ shared class CompilationEngine {
 	// to distinguish between the possibilities
 	// Any other token is not part of this term and should not be advanced over.
 	void compileTerm() {
-		compilation += "<term>";
-		if (exists type = getNextToken()[0]) {
-			if (type in ["integerConstant", "stringConstant", "identifier"]) {
-				
+		Boolean isTerm(String type, String token) {
+			return (
+				type in ["integerConstant", "stringConstant", "identifier"] ||
+				token in ["true", "false", "null", "this", "(", ")", "-", "~"]
+			);
+		}
+		// get next token
+		value [type, token] = getNextToken();
+		if (!isTerm(type, token)) {
+			compilationError("Expected a term");
+		}
+		compilation += "<term>\n";
+		// if unary op, add it an then compile a term
+		if (token in ["-", "~"]) {
+			compilation += tokens[index++] else "" + "\n";
+			compileTerm();
+		}
+		// if keyword term, add it as the term
+		else if (token in ["true", "false", "null", "this"]) {
+			compilation += tokens[index++] else "" + "\n";
+		}
+		// if int const or string const, add it as the term
+		else if (type in ["integerConstant", "stringConstant"]) {
+			compilation += tokens[index++] else "" + "\n";
+		}
+		// if expression in parenthesis, add it
+		else if (token == "(") {
+			// write '('
+			compilation += tokens[index++] else "" + "\n";
+			// add expression
+			compileExpression();
+			// write ')'
+			value [type2, token2] = getNextToken();
+			if (token2 == ")") {
+				compilation += tokens[index++] else "" + "\n";
 			}
-			else if (exists token = getNextToken()[1]) {
-				if (token in ["true", "false", "null", "this"]) {
-					
+			else {
+				compilationError("Expected ')' in term");
+			}
+		}
+		// check next token
+		else {
+			value [lookAheadType, lookAheadToken] = getLookAheadToken();
+			// add array access
+			if (lookAheadToken == "[") {
+				value [type2, token2] = getNextToken();
+				if (type2 == "identifier") {
+					// add identifier
+					compilation += tokens[index++] else "" + "\n";
+					// add '['
+					compilation += tokens[index++] else "" + "\n";
+					// add expression
+					compileExpression();
+					// add ']'
+					value [type3, token3] = getNextToken();
+					if (token3 == "]") {
+						compilation += tokens[index++] else "" + "\n";
+					}
+					else {
+						compilationError("Expected ']' in expression");
+					}
+				}
+				else {
+					compilationError("Expected identifer");
+				}
+			}
+			// add subroutine call
+			else if (lookAheadToken in ["(", "."]) {
+				// add identifier
+				value [type2, token2] = getNextToken();
+				if (type2 == "identifier") {
+					compilation += tokens[index++] else "" + "\n";						
+				}
+				else {
+					compilationError("Expected identifier in term as class name or subroutine");
+				}
+				// add optional dot and identifier
+				value [type3, token3] = getNextToken();
+				if (token3 == ".") {
+					// add '.'
+					compilation += tokens[index++] else "" + "\n";
+					// add subroutine name
+					value [type4, token4] = getNextToken();
+					if (type4 == "identifier") {
+						compilation += tokens[index++] else "" + "\n";						
+					}
+					else {
+						compilationError("Expected subroutine name in term");
+					}					
+				}
+				// add '('
+				value [type5, token5] = getNextToken();
+				if (token5 == "(") {
+					compilation += tokens[index++] else "" + "\n";						
+				}
+				else {
+					compilationError("Expected '(' in term");
+				}
+				// add expression list
+				compileExpressionList();
+				// add ')'
+				value [type6, token6] = getNextToken();
+				if (token6 == ")") {
+					compilation += tokens[index++] else "" + "\n";						
+				}
+				else {
+					compilationError("Expected ')' in term");
+				}
+			}
+			// add identifier
+			else {
+				value [type2, token2] = getNextToken();
+				if (type2 == "identifier") {
+					compilation += tokens[index++] else "" + "\n";						
+				}
+				else {
+					compilationError("Expected identifier in term");
 				}
 			}
 		}
-		compilation += "</term>";
+		compilation += "</term>\n";
 	}
 	
 	// Compiles a (possibly empty) comma separated
 	// list of expressions
 	void compileExpressionList() {
-		compilation += "<expressionList>";
+		compilation += "<expressionList>\n";
 		// optional expression list
-		
-		compilation += "</expressionList>";
+		value [type, token] = getNextToken();
+		if (token != ")") {
+			// add expression
+			compileExpression();
+			// check for additional expressions
+			while (true) {
+				value [type2, token2] = getNextToken();
+				if (token2 != ",") {
+					break;
+				}
+				else {
+					// add ','
+					compilation += tokens[index++] else "" + "\n";
+					// add expression
+					compileExpression();
+				}
+			}
+		}
+		compilation += "</expressionList>\n";
 	}
 }

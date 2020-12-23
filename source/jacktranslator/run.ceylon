@@ -23,9 +23,7 @@ shared void run() {
 	// get vm files from command line arguments
 	String[] paths = listFilesInDirectory(process.arguments[0] else "./", "jack");
 	
-	variable String tokenOutput = "";
-	variable String compilationOutput = "";
-	
+
 	// translate each jack file
 	for (path in paths) {
 		// parse path
@@ -37,26 +35,32 @@ shared void run() {
 		}
 		String filename = re.replace(path, "").replace(".jack", "");
 		
-		// create token parser
+		// run tokenizer
+		variable String tokenOutput = "";
+		String tokenizerOutputFile = directory + filename + "T.xml";
+		// print output file path (debugging)
+		//print(tokenizerOutputFile);
+		// creake token parser
 		Tokenizer tokenizer = Tokenizer(directory, filename);
 		// build output
 		tokenOutput += tokenizer.tokenize();
 		// generate xml token output
-		String tokenizerOutputFile = directory + filename + "T.xml";
 		writeFile(tokenizerOutputFile, tokenOutput);
 		// print contents of file for debugging
-		print(tokenizerOutputFile);
-		print(tokenOutput);
+		//print(tokenOutput);
 		
+		// run compilation engine
+		variable String compilationOutput = "";
+		String compilationOutputFile = directory + filename + ".xml";
+		// print output file path (debugging)
+		print(compilationOutputFile);
 		// create compilation engine parser
 		CompilationEngine compiler = CompilationEngine(directory, filename + "T");
 		// build output
 		compilationOutput += compiler.compile();
 		// generate xml token output
-		String compilationOutputFile = directory + filename + ".xml";
 		writeFile(compilationOutputFile, compilationOutput);
 		// print contents of file for debugging
-		print(compilationOutputFile);
 		print(compilationOutput);
 	}
 }
