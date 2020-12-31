@@ -28,6 +28,21 @@ shared void writeFile(String filePath, String text) {
 	}
 }
 
+// write text to a file
+shared void appendToFile(String filePath, String text) {
+	Resource resource = parsePath(filePath).resource;
+	// check the type of the resource
+	if (is File|Nil resource) {
+		// create file if it doesn't exist
+		// otherwise get the resource
+		File file = createFileIfNil(resource);
+		// append contents
+		try (appender = file.Appender()) {
+			appender.writeLine(text);
+		}
+	}
+}
+
 // read a file and return a String
 shared String readFile(String filePath) {
 	Resource resource = parsePath(filePath).resource;
