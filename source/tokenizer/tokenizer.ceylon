@@ -44,13 +44,13 @@ shared class Tokenizer {
 		
 		while (current < input.size) {
 			Character char = input[current] else '\0';
-			
+			// skip whitespace
 			if (char in whitespace) {
 				current++;
 				continue;
 			}
 			
-			// 
+			// symbol tokens
 			if (char in symbolTokens) {
 				String token;
 				if (char == '<') {
@@ -144,50 +144,5 @@ shared class Tokenizer {
 		}
 		
 		return tokens + "</tokens>";
-	}
-	
-	// Are there more tokens in the input
-	Boolean hasMoreTokens() {
-		return false;
-	}
-	
-	// Get the next token from input and make it the current token
-	// Called only if hasMoreToken is true
-	// Initially, there is no current token
-	void advance() {
-	}
-	
-	// Returns type of current token
-	// KEYWORD, SYMBOL, IDENTIFIER, INT_CONST, STRING_CONST
-	String tokenType() {
-		return "";
-	}
-	
-	// Return current token KEYWORD token
-	// CLASS, METHOD, FUNCTION, CONSTRUCTOR, INT, BOOLEAN,
-	// CHAR, VOID, VAR, STATIC, FIELD, LET, DO, IF, ELSE, 
-	// WHILE, RETURN, TRUE, FALSE, NULL, THIS
-	String keyWord() {
-		return "";
-	}
-	
-	// Return current SYMBOL token
-	String symbol() {
-		return "";
-	}
-	
-	// Return current IDENTIFIER token
-	String identifier() {
-		return "";
-	}
-	
-	// Return current INT_CONST value token
-	String intVal() {
-		return "";
-	}
-	
-	// Return current STRING_CONST token
-	String stringVal() {
-		return "";
 	}
 }
