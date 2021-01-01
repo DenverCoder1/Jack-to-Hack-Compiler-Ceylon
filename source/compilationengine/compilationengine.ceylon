@@ -10,17 +10,29 @@ import ceylon.regex {
 	regex,
 	MatchResult
 }
+import vmwriter {
+	VMWriter
+}
+import symboltable {
+	SymbolTable
+}
 
 shared class CompilationEngine {
 	String[] tokens;
 	variable String compilation = "";
 	variable Integer index = 1;
 	variable Integer indentLevel = 0;
+	VMWriter vmWriter;
+	SymbolTable symbolTable;
+	variable Integer labelNum = 0;
 	
 	// Create a new compilation engine
 	shared new (String dir, String file) {
 		// Open .xml file for compilation
 		tokens = readLines(dir + file + ".xml");
+		// create vm writer
+		vmWriter = VMWriter(dir, file);
+		symbolTable = SymbolTable();
 	}
 	
 	shared String compile() {
@@ -94,7 +106,9 @@ shared class CompilationEngine {
 		// add class keyword
 		writeNextToken();
 		// add className identifier
+		String className = getNextToken()[1];
 		if (getNextToken()[0] == "identifier") {
+			
 			writeNextToken();
 		}
 		else {
@@ -113,7 +127,7 @@ shared class CompilationEngine {
 		}
 		// add subroutine declaration
 		while (getNextToken()[1] in ["constructor", "function", "method"]) {
-			compileSubroutineDec();
+			compileSubroutineDec(className + ".");
 		}
 		// add '}' symbol
 		if (getNextToken()[1] == "}") {
@@ -123,7 +137,7 @@ shared class CompilationEngine {
 			compilationError("Expected '}' after class");
 		}
 		indentLevel -= 2;
-		compilation += "</class>";
+		writeString("</class>");
 	}
 	
 	// Compiles a static variable declaration,
@@ -132,8 +146,10 @@ shared class CompilationEngine {
 		writeString("<classVarDec>");
 		indentLevel += 2;
 		// add static/field keyword
+		String kind = getNextToken()[1];
 		writeNextToken();
-		// add type
+		// add identifier type
+		String type = getNextToken()[1];
 		if (getNextToken()[1] in ["int", "char", "boolean"] || getNextToken()[0] == "identifier") {
 			writeNextToken();
 		}
@@ -142,6 +158,9 @@ shared class CompilationEngine {
 		}
 		// add varName
 		if (getNextToken()[0] == "identifier") {
+			// define identifier
+			String name = getNextToken()[1];
+			symbolTable.define(name, type, kind);
 			writeNextToken();
 		}
 		else {
@@ -152,6 +171,8 @@ shared class CompilationEngine {
 			writeNextToken();
 			// add varName
 			if (getNextToken()[0] == "identifier") {
+				String name = getNextToken()[1];
+				symbolTable.define(name, type, kind);
 				writeNextToken();
 			}
 			else {
@@ -171,10 +192,13 @@ shared class CompilationEngine {
 	
 	// Compiles a complete method, function,
 	// method, or constructor
-	void compileSubroutineDec() {
+	void compileSubroutineDec(String className = "") {
 		writeString("<subroutineDec>");
 		indentLevel += 2;
+		// clear subroutine table
+		symbolTable.startSubroutine();
 		// add method type keyword
+		String subroutineType = getNextToken()[1];
 		writeNextToken();
 		// add return type
 		if (getNextToken()[1] in ["void", "int", "char", "boolean"] || getNextToken()[0] == "identifier") {
@@ -184,6 +208,7 @@ shared class CompilationEngine {
 			compilationError("Invalid type in subroutine declaration");
 		}
 		// add subroutine name
+		String subroutineName = getNextToken()[1];
 		if (getNextToken()[0] == "identifier") {
 			writeNextToken();
 		}
@@ -207,7 +232,7 @@ shared class CompilationEngine {
 			compilationError("Expected ')' after class variable declaration");
 		}
 		// add subroutine body
-		compileSubroutineBody();
+		compileSubroutineBody(className, subroutineName, subroutineType);
 		// add return type
 		indentLevel -= 2;
 		writeString("</subroutineDec>");
@@ -222,6 +247,7 @@ shared class CompilationEngine {
 		if (getNextToken()[1] != ")") {
 			// non-empty parameter list
 			// add type
+			String type = getNextToken()[1];
 			if (getNextToken()[1] in ["int", "char", "boolean"] || getNextToken()[0] == "identifier") {
 				writeNextToken();
 			}			
@@ -229,7 +255,9 @@ shared class CompilationEngine {
 				compilationError("Invalid type in parameter list");
 			}
 			// add varName
+			String name = getNextToken()[1];
 			if (getNextToken()[0] == "identifier") {
+				symbolTable.define(name, type, "argument");
 				writeNextToken();
 			}
 			else {
@@ -239,6 +267,7 @@ shared class CompilationEngine {
 			while (getNextToken()[1] == ",") {
 				writeNextToken();
 				// add type
+				String nextType = getNextToken()[1];
 				if (getNextToken()[1] in ["int", "char", "boolean"] || getNextToken()[0] == "identifier") {
 					writeNextToken();
 				}
@@ -246,7 +275,9 @@ shared class CompilationEngine {
 					compilationError("Invalid type in parameter list");
 				}
 				// add varName
+				String nextName = getNextToken()[1];
 				if (getNextToken()[0] == "identifier") {
+					symbolTable.define(nextName, nextType, "argument");
 					writeNextToken();
 				}
 				else {
@@ -259,7 +290,7 @@ shared class CompilationEngine {
 	}
 	
 	// Compiles a subroutine's body
-	void compileSubroutineBody() {
+	void compileSubroutineBody(String className, String subroutineName, String subroutineType) {
 		writeString("<subroutineBody>");
 		indentLevel += 2;
 		// add '{'
@@ -267,11 +298,26 @@ shared class CompilationEngine {
 			writeNextToken();
 		}
 		else {
-			compilationError("Expected '(' after class variable declaration");
+			compilationError("Expected '{' in subroutine body");
 		}
 		// add any variable declarations
+		variable Integer numLocals = 0;
 		while (getNextToken()[1] == "var") {
-			compileVarDec();
+			numLocals += compileVarDec();
+		}
+		if (subroutineType == "method") {
+			numLocals++; // this
+		}
+		// write function statement adding "className." if class name is not empty string
+		vmWriter.writeFunction(className + subroutineName, numLocals);
+		if (subroutineType == "constructor") {
+			vmWriter.writePush("constant", numLocals);
+			vmWriter.writeCall("Memory.alloc", 1);
+		}
+		else if (subroutineType == "method") {
+			// first argument of method is pointer[0] (this)
+			vmWriter.writePush("argument", 0);
+			vmWriter.writeCall("pointer", 0);
 		}
 		// add statements
 		compileStatements();
@@ -280,19 +326,22 @@ shared class CompilationEngine {
 			writeNextToken();
 		}
 		else {
-			compilationError("Expected '(' after class variable declaration");
+			compilationError("Expected '}' after subroutine body");
 		}
 		indentLevel -= 2;
 		writeString("</subroutineBody>");
 	}
 	
 	// Compiles a var declaration
-	void compileVarDec() {
+	Integer compileVarDec() {
 		writeString("<varDec>");
 		indentLevel += 2;
 		// add var keyword
 		writeNextToken();
+		// count variables
+		variable Integer numVars = 1;
 		// add type
+		String type = getNextToken()[1];
 		if (getNextToken()[1] in ["int", "char", "boolean"] || getNextToken()[0] == "identifier") {
 			writeNextToken();
 		}
@@ -300,7 +349,9 @@ shared class CompilationEngine {
 			compilationError("Invalid type in variable declaration");
 		}
 		// add varName
+		String name = getNextToken()[1];
 		if (getNextToken()[0] == "identifier") {
+			symbolTable.define(name, type, "local");
 			writeNextToken();
 		}
 		else {
@@ -310,7 +361,10 @@ shared class CompilationEngine {
 		while (getNextToken()[1] == ",") {
 			writeNextToken();
 			// add varName
+			String nextName = getNextToken()[1];
 			if (getNextToken()[0] == "identifier") {
+				symbolTable.define(nextName, type, "local");
+				numVars += 1;
 				writeNextToken();
 			}
 			else {
@@ -322,10 +376,11 @@ shared class CompilationEngine {
 			writeNextToken();
 		}
 		else {
-			compilationError("Expected ';' after class");
+			compilationError("Expected ';' after variable declaration");
 		}
 		indentLevel -= 2;
 		writeString("</varDec>");
+		return numVars;
 	}
 	
 	// Compiles a sequence of statements
@@ -365,6 +420,9 @@ shared class CompilationEngine {
 		// add let keyword
 		writeNextToken();
 		// add var name
+		String name = getNextToken()[1];
+		String kind = symbolTable.kindOf(name);
+		Integer index = symbolTable.indexOf(name);
 		if (getNextToken()[0] == "identifier") {
 			writeNextToken();
 		}
@@ -376,6 +434,8 @@ shared class CompilationEngine {
 			writeNextToken();
 			// add expression
 			compileExpression();
+			// push index
+			vmWriter.writePush(kind, index);
 			// add ']'
 			if (getNextToken()[1] == "]") {
 				writeNextToken();						
@@ -383,16 +443,35 @@ shared class CompilationEngine {
 			else {
 				compilationError("Expected ']' in let statement");
 			}
-		}
-		// add equals sign
-		if (getNextToken()[1] == "=") {
-			writeNextToken();						
+			// add index with base of array
+			vmWriter.writeArithmetic("add");
+			// add equals sign
+			if (getNextToken()[1] == "=") {
+				writeNextToken();						
+			}
+			else {
+				compilationError("Expected '=' in let statement");
+			}
+			// add expression
+			compileExpression();
+			// array assignment
+			vmWriter.writePop("temp", 0); // store expression in temp 0
+			vmWriter.writePop("pointer", 1); // store register location of array in that
+			vmWriter.writePush("temp", 0);
+			vmWriter.writePop("that", 0);
 		}
 		else {
-			compilationError("Expected '=' in let statement");
+			// add equals sign
+			if (getNextToken()[1] == "=") {
+				writeNextToken();
+			}
+			else {
+				compilationError("Expected '=' in let statement");
+			}
+			// add expression
+			compileExpression();
+			vmWriter.writePop(kind, index);
 		}
-		// add expression
-		compileExpression();
 		// add semicolon
 		if (getNextToken()[1] == ";") {
 			writeNextToken();						
@@ -408,6 +487,11 @@ shared class CompilationEngine {
 	void compileIf() {
 		writeString("<ifStatement>");
 		indentLevel += 2;
+		// set labels
+		labelNum++;
+		String trueLabel = "TRUE_``labelNum``";
+		String falseLabel = "FALSE_``labelNum``";
+		String continueLabel = "CONTINUE_``labelNum``";
 		// add if keyword
 		writeNextToken();
 		// add '('
@@ -419,6 +503,10 @@ shared class CompilationEngine {
 		}
 		// add expression
 		compileExpression();
+		// write conditions
+		vmWriter.writeIf(trueLabel);
+		vmWriter.writeGoto(falseLabel);
+		vmWriter.writeLabel(trueLabel);
 		// add ')'
 		if (getNextToken()[1] == ")") {
 			writeNextToken();						
@@ -435,6 +523,8 @@ shared class CompilationEngine {
 		}
 		// add statements
 		compileStatements();
+		// write continuation
+		vmWriter.writeGoto(continueLabel);
 		// add '}'
 		if (getNextToken()[1] == "}") {
 			writeNextToken();						
@@ -444,6 +534,7 @@ shared class CompilationEngine {
 		}
 		// optional else
 		if (getNextToken()[1] == "else") {
+			vmWriter.writeLabel(falseLabel);
 			// add else keyword
 			writeNextToken();
 			// add '{'
@@ -463,6 +554,7 @@ shared class CompilationEngine {
 				compilationError("Expected '}' in else statement body");
 			}
 		}
+		vmWriter.writeLabel(continueLabel);
 		indentLevel -= 2;
 		writeString("</ifStatement>");
 	}
@@ -471,8 +563,14 @@ shared class CompilationEngine {
 	void compileWhile() {
 		writeString("<whileStatement>");
 		indentLevel += 2;
+		// set labels
+		labelNum++;
+		String whileLabel = "WHILE_``labelNum``";
+		String continueLabel = "WHILE_CONTINUE_``labelNum``";
 		// add while keyword
 		writeNextToken();
+		// write while
+		vmWriter.writeLabel(whileLabel);
 		// add '('
 		if (getNextToken()[1] == "(") {
 			writeNextToken();						
@@ -489,6 +587,9 @@ shared class CompilationEngine {
 		else {
 			compilationError("Expected ')' in while statement");
 		}
+		// write continue
+		vmWriter.writeArithmetic("not");
+		vmWriter.writeIf(continueLabel);
 		// add '{'
 		if (getNextToken()[1] == "{") {
 			writeNextToken();						
@@ -505,6 +606,9 @@ shared class CompilationEngine {
 		else {
 			compilationError("Expected '}' in while statement");
 		}
+		// loop
+		vmWriter.writeGoto(whileLabel);
+		vmWriter.writeLabel(continueLabel);
 		indentLevel -= 2;
 		writeString("</whileStatement>");
 	}
@@ -517,23 +621,31 @@ shared class CompilationEngine {
 		writeNextToken();
 		// add subroutine call --
 		// add identifier
+		variable String subroutineName = getNextToken()[1];
 		if (getNextToken()[0] == "identifier") {
 			writeNextToken();						
 		}
 		else {
 			compilationError("Expected identifier in do statement");
 		}
+		Boolean addArgument; // whether to add 'this' argument or not
 		// add optional dot and identifier
 		if (getNextToken()[1] == ".") {
 			// add '.'
+			subroutineName += ".";
 			writeNextToken();
 			// add subroutine name
 			if (getNextToken()[0] == "identifier") {
+				subroutineName += getNextToken()[1];
 				writeNextToken();						
 			}
 			else {
 				compilationError("Expected identifier in do statement after '.'");
-			}						
+			}
+			addArgument = true;			
+		}
+		else {
+			addArgument = false;
 		}
 		// add '('
 		if (getNextToken()[1] == "(") {
@@ -543,7 +655,11 @@ shared class CompilationEngine {
 			compilationError("Expected '(' in do statement");
 		}
 		// add expression list
-		compileExpressionList();
+		variable Integer numArgs = compileExpressionList();
+		if (addArgument) {
+			numArgs++;
+		}
+		vmWriter.writeCall(subroutineName, numArgs);
 		// add ')'
 		if (getNextToken()[1] == ")") {
 			writeNextToken();						
@@ -551,6 +667,8 @@ shared class CompilationEngine {
 		else {
 			compilationError("Expected ')' in do statement");
 		}
+		// ignore result from executing code
+		vmWriter.writePop("temp", 0);
 		// add semicolon
 		if (getNextToken()[1] == ";") {
 			writeNextToken();						
@@ -573,6 +691,10 @@ shared class CompilationEngine {
 		if (getNextToken()[1] != ";") {
 			compileExpression();						
 		}
+		else {
+			// push 0 if void
+			vmWriter.writePop("constant", 0);
+		}
 		// add semicolon
 		if (getNextToken()[1] == ";") {
 			writeNextToken();						
@@ -580,6 +702,7 @@ shared class CompilationEngine {
 		else {
 			compilationError("Expected ';' in do statement");
 		}
+		vmWriter.writeReturn();
 		indentLevel -= 2;
 		writeString("</returnStatement>");
 	}
@@ -673,23 +796,31 @@ shared class CompilationEngine {
 			// add subroutine call
 			else if (lookAheadToken in ["(", "."]) {
 				// add identifier
+				variable String subroutineName = getNextToken()[1];
 				if (getNextToken()[0] == "identifier") {
 					writeNextToken();						
 				}
 				else {
 					compilationError("Expected identifier in term as class name or subroutine");
 				}
+				Boolean addArgument; // whether to add 'this' argument or not
 				// add optional dot and identifier
 				if (getNextToken()[1] == ".") {
+					subroutineName += ".";
 					// add '.'
 					writeNextToken();
 					// add subroutine name
 					if (getNextToken()[0] == "identifier") {
+						subroutineName += getNextToken()[1];
 						writeNextToken();						
 					}
 					else {
 						compilationError("Expected valid subroutine name in term");
-					}					
+					}		
+					addArgument = true;			
+				}
+				else {
+					addArgument = false;
 				}
 				// add '('
 				if (getNextToken()[1] == "(") {
@@ -699,7 +830,11 @@ shared class CompilationEngine {
 					compilationError("Expected '(' in term");
 				}
 				// add expression list
-				compileExpressionList();
+				variable Integer numArgs = compileExpressionList();
+				if (addArgument) {
+					numArgs++;
+				}
+				vmWriter.writeCall(subroutineName, numArgs);
 				// add ')'
 				if (getNextToken()[1] == ")") {
 					writeNextToken();						
@@ -724,22 +859,26 @@ shared class CompilationEngine {
 	
 	// Compiles a (possibly empty) comma separated
 	// list of expressions
-	void compileExpressionList() {
+	Integer compileExpressionList() {
 		writeString("<expressionList>");
 		indentLevel += 2;
+		variable Integer numArgs = 0;
 		// optional expression list
 		if (getNextToken()[1] != ")") {
 			// add expression
 			compileExpression();
+			numArgs++;
 			// check for additional expressions
 			while (getNextToken()[1] == ",") {
 				// add ','
 				writeNextToken();
 				// add expression
 				compileExpression();
+				numArgs++;
 			}
 		}
 		indentLevel -= 2;
 		writeString("</expressionList>");
+		return numArgs;
 	}
 }

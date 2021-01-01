@@ -19,17 +19,17 @@ shared class SymbolTable {
 	}
 	
 	// reset subroutine scope
-	void startSubroutine() {
+	shared void startSubroutine() {
 		subroutineScope.clear();
 	}
 	
 	// define a new identifier and assign running index
-	void define(String name, String type, String kind) {
+	shared void define(String name, String type, String kind) {
 		if (kind in ["static", "field"]) {
 			Integer count = varCount(kind);
 			classScope.put(name, [type, kind, count]);
 		}
-		else if (kind in ["arg", "var"]) {
+		else if (kind in ["argument", "variable"]) {
 			Integer count = varCount(kind);
 			subroutineScope.put(name, [type, kind, count]);
 		}
@@ -50,7 +50,7 @@ shared class SymbolTable {
 			return classScope.count(matchesKind);
 		}
 		// count in subroutine scope
-		else if (kind in ["arg", "var"]) {
+		else if (kind in ["argument", "variable"]) {
 			return subroutineScope.count(matchesKind);
 		}
 		else {
@@ -58,21 +58,27 @@ shared class SymbolTable {
 		}
 	}
 	
-	// returns the type of the named identifier
-	String typeOf(String name) {
+	// returns the type of the named identifier or "none"
+	shared String typeOf(String name) {
 		value identifier = classScope[name] else subroutineScope[name] else ["none", null, null];
 		return identifier[0];
 	}
 	
 	// returns the kind of the named identifier
-	String kindOf(String name) {
+	shared String kindOf(String name) {
 		value identifier = classScope[name] else subroutineScope[name] else [null, "none", null];
+		if (identifier[1] == "none") {
+			throw Exception("kind is unknown");
+		}
 		return identifier[1];
 	}
 	
 	// returns the index of the named identifier
-	Integer indexOf(String name) {
-		value identifier = classScope[name] else subroutineScope[name] else [null, null, 0];
+	shared Integer indexOf(String name) {
+		value identifier = classScope[name] else subroutineScope[name] else [null, null, -1];
+		if (identifier[2] == -1) {
+			throw Exception("index is unknown");
+		}
 		return identifier[2];
 	}
 }

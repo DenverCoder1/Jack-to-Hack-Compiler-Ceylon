@@ -15,13 +15,13 @@ shared class VMWriter {
 	}
 	
 	// write a VM push command
-	shared void writePush(String segment, Integer index) {
-		appendToFile(outputFile, "push ``segment`` ``index``\n");
+	shared void writePush(String kind, Integer index) {
+		appendToFile(outputFile, "push ``kind`` ``index``\n");
 	}
 	
 	// write a VM pop command
-	shared void writePop(String segment, Integer index) {
-		appendToFile(outputFile, "pop ``segment`` ``index``\n");
+	shared void writePop(String kind, Integer index) {
+		appendToFile(outputFile, "pop ``kind`` ``index``\n");
 	}
 	
 	// write a VM arithmetic-logical command
