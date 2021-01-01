@@ -3,6 +3,7 @@
 // Daniel Klein
 
 import files {
+	writeFile,
 	appendToFile
 }
 
@@ -12,6 +13,7 @@ shared class VMWriter {
 	
 	shared new(String dir, String file) {
 		outputFile = dir + file + ".vm";
+		writeFile(outputFile, "");
 	}
 	
 	// write a VM push command
