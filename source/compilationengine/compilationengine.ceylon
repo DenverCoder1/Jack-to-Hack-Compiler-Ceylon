@@ -696,7 +696,7 @@ shared class CompilationEngine {
 		}
 		else {
 			// push 0 if void
-			vmWriter.writePop("constant", 0);
+			vmWriter.writePush("constant", 0);
 		}
 		// add semicolon
 		if (getNextToken()[1] == ";") {

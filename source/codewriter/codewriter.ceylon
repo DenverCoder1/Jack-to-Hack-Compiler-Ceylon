@@ -244,6 +244,7 @@ shared class CodeWriter {
 		}
 		// other
 		else {
+			print(arg1);
 			throw Exception("Illegal pop argument 1");
 		}
 	}

@@ -18,6 +18,9 @@ import ceylon.regex {
 	MatchResult,
 	regex
 }
+import vmtranslator {
+	translateVM
+}
 
 "Run the module `jacktranslator`."
 shared void run() {
@@ -60,6 +63,7 @@ shared void run() {
 		// print contents of file for debugging
 		print(readFile(directory + filename + ".vm"));
 		
-		
+		// translate VM to HACK
+		translateVM(directory, directory + filename + ".asm");
 	}
 }

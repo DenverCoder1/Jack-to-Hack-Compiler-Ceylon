@@ -18,10 +18,9 @@ import ceylon.regex {
 	regex
 }
 
-"Run the module `vmtranslator`."
-shared void run() {
-	// get vm files from command line arguments
-	String[] paths = listFilesInDirectory(process.arguments[0] else "./", "vm");
+shared void translateVM(String vmDirectory, String asmOutputFile) {
+	// get vm files from directory run function argument
+	String[] paths = listFilesInDirectory(vmDirectory, "vm");
 	
 	variable String output = "";
 	CodeWriter codewriter = CodeWriter();
@@ -43,14 +42,22 @@ shared void run() {
 		Parser parser = Parser(directory, filename);
 		// build output
 		output += "// Translation of ``filename``.vm" +
-				  "\n// ----------------------------------\n\n";
+				"\n// ----------------------------------\n\n";
 		output += parser.translateVM(codewriter);
 	}
 	
 	// write output
-	String outputFile = process.arguments.last else "./resource/output.asm";
-	writeFile(outputFile, output);
+	writeFile(asmOutputFile, output);
 	// print contents of file for debugging
 	print(output);
-	print(outputFile);
+	print(asmOutputFile);
+}
+
+"Run the module `vmtranslator`."
+shared void run() {
+	// get the vm files from the directory
+	String vmDirectory = process.arguments[0] else "./";
+	String asmOutputFile = process.arguments.last else "./resource/output.asm";
+	// run vm translator
+	translateVM(vmDirectory, asmOutputFile);
 }
