@@ -16,6 +16,9 @@ import vmwriter {
 import symboltable {
 	SymbolTable
 }
+import ceylon.collection {
+	HashMap
+}
 
 shared class CompilationEngine {
 	String[] tokens;
@@ -642,10 +645,10 @@ shared class CompilationEngine {
 			else {
 				compilationError("Expected identifier in do statement after '.'");
 			}
-			addArgument = true;			
+			addArgument = false;			
 		}
 		else {
-			addArgument = false;
+			addArgument = true;
 		}
 		// add '('
 		if (getNextToken()[1] == "(") {
@@ -713,10 +716,30 @@ shared class CompilationEngine {
 		indentLevel += 2;
 		compileTerm();
 		while (getNextToken()[1] in ["+","-","*","/","&amp;","|","&lt;","&gt;","="]) {
-			// add op
+			// add operator to compilation tokens
+			String op = getNextToken()[1];
 			writeNextToken();
 			// add term
 			compileTerm();
+			// add command for the operator to the vm file
+			value commands = HashMap<String,String> {
+				"+"     -> "add",
+				"-"     -> "sub",
+				"&amp;" -> "and",
+				"|"     -> "or",
+				"&gt;"  -> "gt",
+				"&lt;"  -> "lt",
+				"="     -> "eq"
+			};
+			if (exists command = commands[op]) {
+				vmWriter.writeArithmetic(command);
+			}
+			else if (op == "*") {
+				vmWriter.writeCall("Math.multiply", 2);
+			}
+			else if (op == "/") {
+				vmWriter.writeCall("Math.divide", 2);
+			}
 		}
 		indentLevel -= 2;
 		writeString("</expression>");
@@ -744,15 +767,40 @@ shared class CompilationEngine {
 		indentLevel += 2;
 		// if unary op, add it an then compile a term
 		if (token in ["-", "~"]) {
+			String command = if (token == "-") then "neg" else "not";
 			writeNextToken();
 			compileTerm();
+			vmWriter.writeArithmetic(command);
 		}
 		// if keyword term, add it as the term
-		else if (token in ["true", "false", "null", "this"]) {
+		else if (token in ["false", "null"]) {
+			vmWriter.writePush("constant", 0);
+			writeNextToken();
+		}
+		else if (token == "true") {
+			vmWriter.writePush("constant", 1);
+			writeNextToken();
+		}
+		else if (token == "this") {
+			vmWriter.writePush("pointer", 0);
 			writeNextToken();
 		}
 		// if int const or string const, add it as the term
-		else if (type in ["integerConstant", "stringConstant"]) {
+		else if (type == "integerConstant") {
+			Integer|ParseException intVal = Integer.parse(getNextToken()[1]);
+			if (is Integer intVal) {
+				vmWriter.writePush("constant", intVal);
+			}
+			writeNextToken();
+		}
+		else if (type == "stringConstant") {
+			String strVal = getNextToken()[1];
+			vmWriter.writePush("constant", strVal.size);
+			vmWriter.writeCall("String.new", 1);
+			for (letter in strVal) {
+				vmWriter.writePush("constant", letter.integer);
+				vmWriter.writeCall("String.appendChar", 2);
+			}
 			writeNextToken();
 		}
 		// if expression in parenthesis, add it
@@ -774,6 +822,8 @@ shared class CompilationEngine {
 			String lookAheadToken = getLookAheadToken()[1];
 			// add array access
 			if (lookAheadToken == "[") {
+				String kind = symbolTable.kindOf(getNextToken()[1]);
+				Integer index = symbolTable.indexOf(getNextToken()[1]);
 				if (getNextToken()[0] == "identifier") {
 					// add identifier
 					writeNextToken();
@@ -781,6 +831,11 @@ shared class CompilationEngine {
 					writeNextToken();
 					// add expression
 					compileExpression();
+					// translate array access
+					vmWriter.writePush(kind, index);
+					vmWriter.writeArithmetic("add");
+					vmWriter.writePop("pointer", 1);
+					vmWriter.writePush("that", 0);
 					// add ']'
 					if (getNextToken()[1] == "]") {
 						writeNextToken();
@@ -817,10 +872,10 @@ shared class CompilationEngine {
 					else {
 						compilationError("Expected valid subroutine name in term");
 					}		
-					addArgument = true;			
+					addArgument = false;			
 				}
 				else {
-					addArgument = false;
+					addArgument = true;
 				}
 				// add '('
 				if (getNextToken()[1] == "(") {
@@ -843,10 +898,13 @@ shared class CompilationEngine {
 					compilationError("Expected ')' in term");
 				}
 			}
-			// add identifier
+			// add identifier (variable)
 			else {
 				if (getNextToken()[0] == "identifier") {
-					writeNextToken();						
+					String kind = symbolTable.kindOf(getNextToken()[1]);
+					Integer index = symbolTable.indexOf(getNextToken()[1]);
+					vmWriter.writePush(kind, index);
+					writeNextToken();	
 				}
 				else {
 					compilationError("Expected identifier in term");

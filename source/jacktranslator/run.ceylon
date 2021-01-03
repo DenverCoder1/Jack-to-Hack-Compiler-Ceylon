@@ -59,5 +59,7 @@ shared void run() {
 		print(directory + filename + ".vm");
 		// print contents of file for debugging
 		print(readFile(directory + filename + ".vm"));
+		
+		
 	}
 }
