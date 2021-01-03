@@ -4,6 +4,7 @@
 
 import files {
 	writeFile,
+	readFile,
 	listFilesInDirectory
 }
 import tokenizer {
@@ -38,29 +39,25 @@ shared void run() {
 		// run tokenizer
 		variable String tokenOutput = "";
 		String tokenizerOutputFile = directory + filename + "T.xml";
-		// print output file path (debugging)
-		//print(tokenizerOutputFile);
 		// creake token parser
 		Tokenizer tokenizer = Tokenizer(directory, filename);
 		// build output
 		tokenOutput += tokenizer.tokenize();
 		// generate xml token output
 		writeFile(tokenizerOutputFile, tokenOutput);
-		// print contents of file for debugging
-		//print(tokenOutput);
 		
 		// run compilation engine
 		variable String compilationOutput = "";
 		String compilationOutputFile = directory + filename + ".xml";
-		// print output file path (debugging)
-		print(compilationOutputFile);
 		// create compilation engine parser
-		CompilationEngine compiler = CompilationEngine(directory, filename + "T");
+		CompilationEngine compiler = CompilationEngine(directory, filename, "T");
 		// build output
 		compilationOutput += compiler.compile();
 		// generate xml token output
 		writeFile(compilationOutputFile, compilationOutput);
+		// print output file path (debugging)
+		print(directory + filename + ".vm");
 		// print contents of file for debugging
-		print(compilationOutput);
+		print(readFile(directory + filename + ".vm"));
 	}
 }

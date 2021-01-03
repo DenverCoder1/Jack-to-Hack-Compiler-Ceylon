@@ -1,0 +1,11 @@
+
+function Main.main 0
+
+call Output.printInt 2
+
+pop temp 0
+
+pop constant 0
+
+return
+

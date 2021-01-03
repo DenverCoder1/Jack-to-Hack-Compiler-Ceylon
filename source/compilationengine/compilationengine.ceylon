@@ -27,9 +27,9 @@ shared class CompilationEngine {
 	variable Integer labelNum = 0;
 	
 	// Create a new compilation engine
-	shared new (String dir, String file) {
+	shared new (String dir, String file, String suffix) {
 		// Open .xml file for compilation
-		tokens = readLines(dir + file + ".xml");
+		tokens = readLines(dir + file + suffix + ".xml");
 		// create vm writer
 		vmWriter = VMWriter(dir, file);
 		symbolTable = SymbolTable();
