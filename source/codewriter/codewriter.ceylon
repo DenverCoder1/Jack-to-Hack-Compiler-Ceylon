@@ -186,7 +186,7 @@ shared class CodeWriter {
 			if (is Integer register) {
 				return pushPointerOrTemp(register + 3);
 			}
-			throw Exception("Illegal argument 2 to push pointer");
+			throw Exception("Illegal argument 2 to push pointer. Argument was ``arg2``");
 		}
 		// temp
 		else if (arg1 == "temp") {
@@ -194,11 +194,11 @@ shared class CodeWriter {
 			if (is Integer register) {
 				return pushPointerOrTemp(register + 5);
 			}
-			throw Exception("Illegal argument 2 to push temp");
+			throw Exception("Illegal argument 2 to push temp. Argument was ``arg2``");
 		}
 		// other
 		else {
-			throw Exception("Illegal push argument 1");
+			throw Exception("Illegal push argument 1. Argument was ``arg1``");
 		}
 	}
 	
@@ -232,7 +232,7 @@ shared class CodeWriter {
 			if (is Integer register) {
 				return popPointerOrTemp(register + 3);
 			}
-			throw Exception("Illegal argument 2 to pop pointer");
+			throw Exception("Illegal argument 2 to pop pointer. Argument was ``arg2``");
 		}
 		// temp
 		else if (arg1 == "temp") {
@@ -240,12 +240,11 @@ shared class CodeWriter {
 			if (is Integer register) {
 				return popPointerOrTemp(register + 5);
 			}
-			throw Exception("Illegal argument 2 to pop temp");
+			throw Exception("Illegal argument 2 to pop temp. Argument was ``arg2``");
 		}
 		// other
 		else {
-			print(arg1);
-			throw Exception("Illegal pop argument 1");
+			throw Exception("Illegal pop argument 1. Argument was ``arg1``");
 		}
 	}
 	

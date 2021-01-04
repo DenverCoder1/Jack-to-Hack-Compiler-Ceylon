@@ -29,12 +29,12 @@ shared class SymbolTable {
 			Integer count = varCount(kind);
 			classScope.put(name, [type, kind, count]);
 		}
-		else if (kind in ["argument", "variable"]) {
+		else if (kind in ["argument", "local"]) {
 			Integer count = varCount(kind);
 			subroutineScope.put(name, [type, kind, count]);
 		}
 		else {
-			throw Exception("Kind is invalid");
+			throw Exception("Kind ``kind`` is invalid in define");
 		}
 	}
 	
@@ -50,11 +50,11 @@ shared class SymbolTable {
 			return classScope.count(matchesKind);
 		}
 		// count in subroutine scope
-		else if (kind in ["argument", "variable"]) {
+		else if (kind in ["argument", "local"]) {
 			return subroutineScope.count(matchesKind);
 		}
 		else {
-			throw Exception("Kind is invalid");
+			throw Exception("Kind ``kind`` is invalid in varCount");
 		}
 	}
 	

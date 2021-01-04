@@ -778,7 +778,8 @@ shared class CompilationEngine {
 			writeNextToken();
 		}
 		else if (token == "true") {
-			vmWriter.writePush("constant", 1);
+			vmWriter.writePush("constant", 0);
+			vmWriter.writeArithmetic("not");
 			writeNextToken();
 		}
 		else if (token == "this") {

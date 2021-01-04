@@ -1,0 +1,161 @@
+
+function Ball.new 0
+
+push constant 0
+
+call Memory.alloc 1
+
+push argument 0
+
+pop field 0
+
+push argument 1
+
+pop field 1
+
+push argument 2
+
+pop field 10
+
+push argument 3
+
+push constant 6
+
+sub
+
+pop field 11
+
+push argument 4
+
+pop field 12
+
+push argument 5
+
+push constant 6
+
+sub
+
+pop field 13
+
+push constant 0
+
+pop field 14
+
+call show 1
+
+pop temp 0
+
+push pointer 0
+
+return
+
+function Ball.dispose 1
+
+push argument 0
+
+call pointer 0
+
+push pointer 0
+
+call Memory.deAlloc 1
+
+pop temp 0
+
+push constant 0
+
+return
+
+function Ball.show 1
+
+push argument 0
+
+call pointer 0
+
+push constant 1
+
+call Screen.setColor 1
+
+pop temp 0
+
+call draw 1
+
+pop temp 0
+
+push constant 0
+
+return
+
+function Ball.hide 1
+
+push argument 0
+
+call pointer 0
+
+push constant 0
+
+call Screen.setColor 1
+
+pop temp 0
+
+call draw 1
+
+pop temp 0
+
+push constant 0
+
+return
+
+function Ball.draw 1
+
+push argument 0
+
+call pointer 0
+
+push field 0
+
+push field 1
+
+push field 0
+
+push constant 5
+
+add
+
+push field 1
+
+push constant 5
+
+add
+
+call Screen.drawRectangle 4
+
+pop temp 0
+
+push constant 0
+
+return
+
+function Ball.getLeft 1
+
+push argument 0
+
+call pointer 0
+
+push field 0
+
+return
+
+function Ball.getRight 1
+
+push argument 0
+
+call pointer 0
+
+push field 0
+
+push constant 5
+
+add
+
+return
+

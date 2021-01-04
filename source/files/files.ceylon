@@ -38,7 +38,7 @@ shared void appendToFile(String filePath, String text) {
 		File file = createFileIfNil(resource);
 		// append contents
 		try (appender = file.Appender()) {
-			appender.writeLine(text);
+			appender.write(text);
 		}
 	}
 }

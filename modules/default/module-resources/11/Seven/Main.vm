@@ -15,7 +15,7 @@ call Output.printInt 1
 
 pop temp 0
 
-pop constant 0
+push constant 0
 
 return
 
