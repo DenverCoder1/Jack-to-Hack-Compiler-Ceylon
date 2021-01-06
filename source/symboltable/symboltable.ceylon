@@ -26,8 +26,10 @@ shared class SymbolTable {
 	// define a new identifier and assign running index
 	shared void define(String name, String type, String kind) {
 		if (kind in ["static", "field"]) {
-			Integer count = varCount(kind);
-			classScope.put(name, [type, kind, count]);
+			// field => this
+			String kindIn = if (kind=="field") then "this" else kind;
+			Integer count = varCount(kindIn);
+			classScope.put(name, [type, kindIn, count]);
 		}
 		else if (kind in ["argument", "local"]) {
 			Integer count = varCount(kind);
@@ -40,13 +42,13 @@ shared class SymbolTable {
 	
 	// returns the number of variables of the given kind
 	// already defined in the current scope
-	Integer varCount(String kind) {
+	shared Integer varCount(String kind) {
 		// function to check if hash element kind matches argument kind
 		Boolean matchesKind(String->[String, String, Integer] element) {
 			return element.item[1] == kind;
 		}
 		// count in class scope
-		if (kind in ["static", "field"]) {
+		if (kind in ["static", "this"]) {
 			return classScope.count(matchesKind);
 		}
 		// count in subroutine scope

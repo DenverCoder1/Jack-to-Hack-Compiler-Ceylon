@@ -25,8 +25,8 @@ import vmtranslator {
 "Run the module `jacktranslator`."
 shared void run() {
 	// get vm files from command line arguments
-	String[] paths = listFilesInDirectory(process.arguments[0] else "./", "jack");
-	
+	String dir = process.arguments[0] else "./";
+	String[] paths = listFilesInDirectory(dir, "jack");
 
 	// translate each jack file
 	for (path in paths) {
@@ -59,11 +59,12 @@ shared void run() {
 		// generate xml token output
 		writeFile(compilationOutputFile, compilationOutput);
 		// print output file path (debugging)
-		print(directory + filename + ".vm");
+		//print(directory + filename + ".vm");
 		// print contents of file for debugging
-		print(readFile(directory + filename + ".vm"));
-		
-		// translate VM to HACK
-		translateVM(directory, directory + filename + ".asm");
+		//print(readFile(directory + filename + ".vm"));
 	}
+	
+	// translate VM to HACK
+	String asmFilename = "output";
+	translateVM(dir, dir + asmFilename + ".asm");
 }

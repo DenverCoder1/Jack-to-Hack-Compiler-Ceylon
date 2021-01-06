@@ -28,6 +28,7 @@ shared class CompilationEngine {
 	VMWriter vmWriter;
 	SymbolTable symbolTable;
 	variable Integer labelNum = 0;
+	String currentClass;
 	
 	// Create a new compilation engine
 	shared new (String dir, String file, String suffix) {
@@ -36,6 +37,7 @@ shared class CompilationEngine {
 		// create vm writer
 		vmWriter = VMWriter(dir, file);
 		symbolTable = SymbolTable();
+		currentClass = file;
 	}
 	
 	shared String compile() {
@@ -308,19 +310,18 @@ shared class CompilationEngine {
 		while (getNextToken()[1] == "var") {
 			numLocals += compileVarDec();
 		}
-		if (subroutineType == "method") {
-			numLocals++; // this
-		}
 		// write function statement adding "className." if class name is not empty string
 		vmWriter.writeFunction(className + subroutineName, numLocals);
 		if (subroutineType == "constructor") {
-			vmWriter.writePush("constant", numLocals);
+			vmWriter.writePush("constant", symbolTable.varCount("this"));
 			vmWriter.writeCall("Memory.alloc", 1);
+			vmWriter.writePop("pointer", 0);
 		}
 		else if (subroutineType == "method") {
 			// first argument of method is pointer[0] (this)
 			vmWriter.writePush("argument", 0);
-			vmWriter.writeCall("pointer", 0);
+			vmWriter.writePop("pointer", 0);
+			
 		}
 		// add statements
 		compileStatements();
@@ -492,9 +493,9 @@ shared class CompilationEngine {
 		indentLevel += 2;
 		// set labels
 		labelNum++;
-		String trueLabel = "TRUE_``labelNum``";
-		String falseLabel = "FALSE_``labelNum``";
-		String continueLabel = "CONTINUE_``labelNum``";
+		String trueLabel = "IF_TRUE_``labelNum``";
+		String falseLabel = "IF_FALSE_``labelNum``";
+		String continueLabel = "IF_CONTINUE_``labelNum``";
 		// add if keyword
 		writeNextToken();
 		// add '('
@@ -526,8 +527,6 @@ shared class CompilationEngine {
 		}
 		// add statements
 		compileStatements();
-		// write continuation
-		vmWriter.writeGoto(continueLabel);
 		// add '}'
 		if (getNextToken()[1] == "}") {
 			writeNextToken();						
@@ -535,9 +534,11 @@ shared class CompilationEngine {
 		else {
 			compilationError("Expected '}' in if statement body");
 		}
+		vmWriter.writeLabel(falseLabel);
 		// optional else
 		if (getNextToken()[1] == "else") {
-			vmWriter.writeLabel(falseLabel);
+			// write continuation
+			vmWriter.writeGoto(continueLabel);
 			// add else keyword
 			writeNextToken();
 			// add '{'
@@ -556,8 +557,8 @@ shared class CompilationEngine {
 			else {
 				compilationError("Expected '}' in else statement body");
 			}
+			vmWriter.writeLabel(continueLabel);
 		}
-		vmWriter.writeLabel(continueLabel);
 		indentLevel -= 2;
 		writeString("</ifStatement>");
 	}
@@ -631,9 +632,17 @@ shared class CompilationEngine {
 		else {
 			compilationError("Expected identifier in do statement");
 		}
-		Boolean addArgument; // whether to add 'this' argument or not
+		variable Boolean addArgument = false; // whether to add 'this' argument or not
 		// add optional dot and identifier
 		if (getNextToken()[1] == ".") {
+			// find the class of the previous identifier
+			String className = symbolTable.typeOf(subroutineName);
+			if (className != "none") {
+				String identifierKind = symbolTable.kindOf(subroutineName);
+				vmWriter.writePush(identifierKind, 0);
+				subroutineName = className;
+				addArgument = true;
+			}
 			// add '.'
 			subroutineName += ".";
 			writeNextToken();
@@ -645,9 +654,10 @@ shared class CompilationEngine {
 			else {
 				compilationError("Expected identifier in do statement after '.'");
 			}
-			addArgument = false;			
 		}
 		else {
+			subroutineName = currentClass + "." + subroutineName;
+			vmWriter.writePush("pointer", 0);
 			addArgument = true;
 		}
 		// add '('
@@ -859,9 +869,16 @@ shared class CompilationEngine {
 				else {
 					compilationError("Expected identifier in term as class name or subroutine");
 				}
-				Boolean addArgument; // whether to add 'this' argument or not
+				variable Boolean addArgument = false; // whether to add 'this' argument or not
 				// add optional dot and identifier
 				if (getNextToken()[1] == ".") {
+					// find the class of the previous identifier
+					String className = symbolTable.typeOf(subroutineName);
+					if (className != "none") {
+						vmWriter.writePush("local", 0);
+						subroutineName = className;
+						addArgument = true;
+					}
 					subroutineName += ".";
 					// add '.'
 					writeNextToken();
@@ -876,6 +893,8 @@ shared class CompilationEngine {
 					addArgument = false;			
 				}
 				else {
+					subroutineName = currentClass + "." + subroutineName;
+					vmWriter.writePush("pointer", 0);
 					addArgument = true;
 				}
 				// add '('
@@ -905,7 +924,7 @@ shared class CompilationEngine {
 					String kind = symbolTable.kindOf(getNextToken()[1]);
 					Integer index = symbolTable.indexOf(getNextToken()[1]);
 					vmWriter.writePush(kind, index);
-					writeNextToken();	
+					writeNextToken();
 				}
 				else {
 					compilationError("Expected identifier in term");

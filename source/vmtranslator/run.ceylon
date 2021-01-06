@@ -49,8 +49,8 @@ shared void translateVM(String vmDirectory, String asmOutputFile) {
 	// write output
 	writeFile(asmOutputFile, output);
 	// print contents of file for debugging
-	print(output);
-	print(asmOutputFile);
+	//print(output);
+	//print(asmOutputFile);
 }
 
 "Run the module `vmtranslator`."
