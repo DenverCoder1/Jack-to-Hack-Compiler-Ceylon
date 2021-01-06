@@ -1409,8 +1409,8 @@ M=0
 A=M
 M=D
 
-// label WHILE_EXP0
-(WHILE_EXP0)
+// label WHILE_1
+(WHILE_1)
 
 // push local 2
 @2
@@ -1465,12 +1465,12 @@ M=0
 A=M-1
 M=!M
 
-// if-goto WHILE_END0
+// if-goto WHILE_CONTINUE_1
 @SP
 AM=M-1
 D=M
 M=0
-@WHILE_END0
+@WHILE_CONTINUE_1
 D;JNE
 
 // push local 2
@@ -2707,12 +2707,12 @@ M=0
 A=M
 M=D
 
-// goto WHILE_EXP0
-@WHILE_EXP0
+// goto WHILE_1
+@WHILE_1
 0;JMP
 
-// label WHILE_END0
-(WHILE_END0)
+// label WHILE_CONTINUE_1
+(WHILE_CONTINUE_1)
 
 // push constant 15
 @15

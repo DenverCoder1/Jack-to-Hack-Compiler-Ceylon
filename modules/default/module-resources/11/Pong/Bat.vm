@@ -102,9 +102,9 @@ pop pointer 0
 push this 4
 push constant 1
 eq
-if-goto IF_TRUE0
-goto IF_FALSE0
-label IF_TRUE0
+if-goto IF_TRUE_1
+goto IF_FALSE_1
+label IF_TRUE_1
 push this 0
 push constant 4
 sub
@@ -112,12 +112,12 @@ pop this 0
 push this 0
 push constant 0
 lt
-if-goto IF_TRUE1
-goto IF_FALSE1
-label IF_TRUE1
+if-goto IF_TRUE_2
+goto IF_FALSE_2
+label IF_TRUE_2
 push constant 0
 pop this 0
-label IF_FALSE1
+label IF_FALSE_2
 push constant 0
 call Screen.setColor 1
 pop temp 0
@@ -151,8 +151,8 @@ push this 3
 add
 call Screen.drawRectangle 4
 pop temp 0
-goto IF_END0
-label IF_FALSE0
+label IF_FALSE_1
+goto IF_CONTINUE_1
 push this 0
 push constant 4
 add
@@ -162,14 +162,14 @@ push this 2
 add
 push constant 511
 gt
-if-goto IF_TRUE2
-goto IF_FALSE2
-label IF_TRUE2
+if-goto IF_TRUE_3
+goto IF_FALSE_3
+label IF_TRUE_3
 push constant 511
 push this 2
 sub
 pop this 0
-label IF_FALSE2
+label IF_FALSE_3
 push constant 0
 call Screen.setColor 1
 pop temp 0
@@ -203,6 +203,6 @@ push this 3
 add
 call Screen.drawRectangle 4
 pop temp 0
-label IF_END0
+label IF_CONTINUE_1
 push constant 0
 return

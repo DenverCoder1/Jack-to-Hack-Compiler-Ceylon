@@ -59,5 +59,6 @@ shared void run() {
 	String vmDirectory = process.arguments[0] else "./";
 	String asmOutputFile = process.arguments.last else "./resource/output.asm";
 	// run vm translator
+	print("Compiling VM \"``vmDirectory``\"");
 	translateVM(vmDirectory, asmOutputFile);
 }

@@ -27,6 +27,8 @@ shared void run() {
 	// get vm files from command line arguments
 	String dir = process.arguments[0] else "./";
 	String[] paths = listFilesInDirectory(dir, "jack");
+	
+	print("Compiling Jack \"``dir``\"");
 
 	// translate each jack file
 	for (path in paths) {

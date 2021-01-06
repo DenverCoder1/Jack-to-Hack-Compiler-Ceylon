@@ -417,8 +417,8 @@ M=0
 @3
 M=D
 
-// push argument 0
-@0
+// push argument 1
+@1
 D=A
 @ARG
 A=M+D
@@ -443,8 +443,8 @@ M=0
 A=M
 M=D
 
-// push argument 1
-@1
+// push argument 2
+@2
 D=A
 @ARG
 A=M+D
@@ -469,8 +469,8 @@ M=0
 A=M
 M=D
 
-// push argument 2
-@2
+// push argument 3
+@3
 D=A
 @ARG
 A=M+D
@@ -1523,20 +1523,20 @@ M=0
 A=M-1
 M=M&D
 
-// if-goto IF_TRUE0
+// if-goto IF_TRUE_1
 @SP
 AM=M-1
 D=M
 M=0
-@IF_TRUE0
+@IF_TRUE_1
 D;JNE
 
-// goto IF_FALSE0
-@IF_FALSE0
+// goto IF_FALSE_1
+@IF_FALSE_1
 0;JMP
 
-// label IF_TRUE0
-(IF_TRUE0)
+// label IF_TRUE_1
+(IF_TRUE_1)
 
 // push pointer 0
 @3
@@ -1713,8 +1713,8 @@ M=0
 @5
 M=D
 
-// label IF_FALSE0
-(IF_FALSE0)
+// label IF_FALSE_1
+(IF_FALSE_1)
 
 // push constant 0
 @0
@@ -1845,20 +1845,20 @@ M=0
 0;JMP
 (continue_3)
 
-// if-goto IF_TRUE0
+// if-goto IF_TRUE_2
 @SP
 AM=M-1
 D=M
 M=0
-@IF_TRUE0
+@IF_TRUE_2
 D;JNE
 
-// goto IF_FALSE0
-@IF_FALSE0
+// goto IF_FALSE_2
+@IF_FALSE_2
 0;JMP
 
-// label IF_TRUE0
-(IF_TRUE0)
+// label IF_TRUE_2
+(IF_TRUE_2)
 
 // push pointer 0
 @3
@@ -2035,8 +2035,8 @@ M=0
 @5
 M=D
 
-// label IF_FALSE0
-(IF_FALSE0)
+// label IF_FALSE_2
+(IF_FALSE_2)
 
 // push constant 0
 @0
@@ -2167,20 +2167,20 @@ M=0
 0;JMP
 (continue_4)
 
-// if-goto IF_TRUE0
+// if-goto IF_TRUE_3
 @SP
 AM=M-1
 D=M
 M=0
-@IF_TRUE0
+@IF_TRUE_3
 D;JNE
 
-// goto IF_FALSE0
-@IF_FALSE0
+// goto IF_FALSE_3
+@IF_FALSE_3
 0;JMP
 
-// label IF_TRUE0
-(IF_TRUE0)
+// label IF_TRUE_3
+(IF_TRUE_3)
 
 // push constant 0
 @0
@@ -2680,8 +2680,8 @@ M=0
 @5
 M=D
 
-// label IF_FALSE0
-(IF_FALSE0)
+// label IF_FALSE_3
+(IF_FALSE_3)
 
 // push constant 0
 @0
@@ -2832,20 +2832,20 @@ M=0
 0;JMP
 (continue_5)
 
-// if-goto IF_TRUE0
+// if-goto IF_TRUE_4
 @SP
 AM=M-1
 D=M
 M=0
-@IF_TRUE0
+@IF_TRUE_4
 D;JNE
 
-// goto IF_FALSE0
-@IF_FALSE0
+// goto IF_FALSE_4
+@IF_FALSE_4
 0;JMP
 
-// label IF_TRUE0
-(IF_TRUE0)
+// label IF_TRUE_4
+(IF_TRUE_4)
 
 // push constant 0
 @0
@@ -3345,8 +3345,8 @@ M=0
 @5
 M=D
 
-// label IF_FALSE0
-(IF_FALSE0)
+// label IF_FALSE_4
+(IF_FALSE_4)
 
 // push constant 0
 @0
@@ -3477,20 +3477,20 @@ M=0
 0;JMP
 (continue_6)
 
-// if-goto IF_TRUE0
+// if-goto IF_TRUE_5
 @SP
 AM=M-1
 D=M
 M=0
-@IF_TRUE0
+@IF_TRUE_5
 D;JNE
 
-// goto IF_FALSE0
-@IF_FALSE0
+// goto IF_FALSE_5
+@IF_FALSE_5
 0;JMP
 
-// label IF_TRUE0
-(IF_TRUE0)
+// label IF_TRUE_5
+(IF_TRUE_5)
 
 // push constant 0
 @0
@@ -3990,8 +3990,8 @@ M=0
 @5
 M=D
 
-// label IF_FALSE0
-(IF_FALSE0)
+// label IF_FALSE_5
+(IF_FALSE_5)
 
 // push constant 0
 @0
@@ -4142,20 +4142,20 @@ M=0
 0;JMP
 (continue_7)
 
-// if-goto IF_TRUE0
+// if-goto IF_TRUE_6
 @SP
 AM=M-1
 D=M
 M=0
-@IF_TRUE0
+@IF_TRUE_6
 D;JNE
 
-// goto IF_FALSE0
-@IF_FALSE0
+// goto IF_FALSE_6
+@IF_FALSE_6
 0;JMP
 
-// label IF_TRUE0
-(IF_TRUE0)
+// label IF_TRUE_6
+(IF_TRUE_6)
 
 // push constant 0
 @0
@@ -4655,8 +4655,8 @@ M=0
 @5
 M=D
 
-// label IF_FALSE0
-(IF_FALSE0)
+// label IF_FALSE_6
+(IF_FALSE_6)
 
 // push constant 0
 @0
@@ -5252,20 +5252,20 @@ M=0
 0;JMP
 (continue_8)
 
-// if-goto IF_TRUE0
+// if-goto IF_TRUE_1
 @SP
 AM=M-1
 D=M
 M=0
-@IF_TRUE0
+@IF_TRUE_1
 D;JNE
 
-// goto IF_FALSE0
-@IF_FALSE0
+// goto IF_FALSE_1
+@IF_FALSE_1
 0;JMP
 
-// label IF_TRUE0
-(IF_TRUE0)
+// label IF_TRUE_1
+(IF_TRUE_1)
 
 // push this 0
 @0
@@ -5336,8 +5336,8 @@ M=0
 @5
 M=D
 
-// label IF_FALSE0
-(IF_FALSE0)
+// label IF_FALSE_1
+(IF_FALSE_1)
 
 // push this 1
 @1
@@ -5384,20 +5384,20 @@ M=0
 0;JMP
 (continue_9)
 
-// if-goto IF_TRUE1
+// if-goto IF_TRUE_2
 @SP
 AM=M-1
 D=M
 M=0
-@IF_TRUE1
+@IF_TRUE_2
 D;JNE
 
-// goto IF_FALSE1
-@IF_FALSE1
+// goto IF_FALSE_2
+@IF_FALSE_2
 0;JMP
 
-// label IF_TRUE1
-(IF_TRUE1)
+// label IF_TRUE_2
+(IF_TRUE_2)
 
 // push this 0
 @0
@@ -5468,8 +5468,8 @@ M=0
 @5
 M=D
 
-// label IF_FALSE1
-(IF_FALSE1)
+// label IF_FALSE_2
+(IF_FALSE_2)
 
 // push this 1
 @1
@@ -5516,20 +5516,20 @@ M=0
 0;JMP
 (continue_10)
 
-// if-goto IF_TRUE2
+// if-goto IF_TRUE_3
 @SP
 AM=M-1
 D=M
 M=0
-@IF_TRUE2
+@IF_TRUE_3
 D;JNE
 
-// goto IF_FALSE2
-@IF_FALSE2
+// goto IF_FALSE_3
+@IF_FALSE_3
 0;JMP
 
-// label IF_TRUE2
-(IF_TRUE2)
+// label IF_TRUE_3
+(IF_TRUE_3)
 
 // push this 0
 @0
@@ -5600,8 +5600,8 @@ M=0
 @5
 M=D
 
-// label IF_FALSE2
-(IF_FALSE2)
+// label IF_FALSE_3
+(IF_FALSE_3)
 
 // push this 1
 @1
@@ -5648,20 +5648,20 @@ M=0
 0;JMP
 (continue_11)
 
-// if-goto IF_TRUE3
+// if-goto IF_TRUE_4
 @SP
 AM=M-1
 D=M
 M=0
-@IF_TRUE3
+@IF_TRUE_4
 D;JNE
 
-// goto IF_FALSE3
-@IF_FALSE3
+// goto IF_FALSE_4
+@IF_FALSE_4
 0;JMP
 
-// label IF_TRUE3
-(IF_TRUE3)
+// label IF_TRUE_4
+(IF_TRUE_4)
 
 // push this 0
 @0
@@ -5732,8 +5732,8 @@ M=0
 @5
 M=D
 
-// label IF_FALSE3
-(IF_FALSE3)
+// label IF_FALSE_4
+(IF_FALSE_4)
 
 // push constant 5
 @5
@@ -5950,8 +5950,8 @@ M=0
 A=M
 M=D
 
-// label WHILE_EXP0
-(WHILE_EXP0)
+// label WHILE_5
+(WHILE_5)
 
 // push local 1
 @1
@@ -5974,16 +5974,16 @@ M=!M
 A=M-1
 M=!M
 
-// if-goto WHILE_END0
+// if-goto WHILE_CONTINUE_5
 @SP
 AM=M-1
 D=M
 M=0
-@WHILE_END0
+@WHILE_CONTINUE_5
 D;JNE
 
-// label WHILE_EXP1
-(WHILE_EXP1)
+// label WHILE_6
+(WHILE_6)
 
 // push local 0
 @0
@@ -6035,12 +6035,12 @@ M=0
 A=M-1
 M=!M
 
-// if-goto WHILE_END1
+// if-goto WHILE_CONTINUE_6
 @SP
 AM=M-1
 D=M
 M=0
-@WHILE_END1
+@WHILE_CONTINUE_6
 D;JNE
 
 // call Keyboard.keyPressed 0
@@ -6174,12 +6174,12 @@ M=0
 @5
 M=D
 
-// goto WHILE_EXP1
-@WHILE_EXP1
+// goto WHILE_6
+@WHILE_6
 0;JMP
 
-// label WHILE_END1
-(WHILE_END1)
+// label WHILE_CONTINUE_6
+(WHILE_CONTINUE_6)
 
 // push local 0
 @0
@@ -6226,20 +6226,20 @@ M=0
 0;JMP
 (continue_13)
 
-// if-goto IF_TRUE0
+// if-goto IF_TRUE_7
 @SP
 AM=M-1
 D=M
 M=0
-@IF_TRUE0
+@IF_TRUE_7
 D;JNE
 
-// goto IF_FALSE0
-@IF_FALSE0
+// goto IF_FALSE_7
+@IF_FALSE_7
 0;JMP
 
-// label IF_TRUE0
-(IF_TRUE0)
+// label IF_TRUE_7
+(IF_TRUE_7)
 
 // push constant 0
 @0
@@ -6269,8 +6269,8 @@ M=0
 A=M
 M=D
 
-// label IF_FALSE0
-(IF_FALSE0)
+// label IF_FALSE_7
+(IF_FALSE_7)
 
 // push local 0
 @0
@@ -6317,20 +6317,20 @@ M=0
 0;JMP
 (continue_14)
 
-// if-goto IF_TRUE1
+// if-goto IF_TRUE_8
 @SP
 AM=M-1
 D=M
 M=0
-@IF_TRUE1
+@IF_TRUE_8
 D;JNE
 
-// goto IF_FALSE1
-@IF_FALSE1
+// goto IF_FALSE_8
+@IF_FALSE_8
 0;JMP
 
-// label IF_TRUE1
-(IF_TRUE1)
+// label IF_TRUE_8
+(IF_TRUE_8)
 
 // push this 0
 @0
@@ -6401,8 +6401,8 @@ M=0
 @5
 M=D
 
-// label IF_FALSE1
-(IF_FALSE1)
+// label IF_FALSE_8
+(IF_FALSE_8)
 
 // push local 0
 @0
@@ -6449,20 +6449,20 @@ M=0
 0;JMP
 (continue_15)
 
-// if-goto IF_TRUE2
+// if-goto IF_TRUE_9
 @SP
 AM=M-1
 D=M
 M=0
-@IF_TRUE2
+@IF_TRUE_9
 D;JNE
 
-// goto IF_FALSE2
-@IF_FALSE2
+// goto IF_FALSE_9
+@IF_FALSE_9
 0;JMP
 
-// label IF_TRUE2
-(IF_TRUE2)
+// label IF_TRUE_9
+(IF_TRUE_9)
 
 // push this 0
 @0
@@ -6533,8 +6533,8 @@ M=0
 @5
 M=D
 
-// label IF_FALSE2
-(IF_FALSE2)
+// label IF_FALSE_9
+(IF_FALSE_9)
 
 // push local 0
 @0
@@ -6581,20 +6581,20 @@ M=0
 0;JMP
 (continue_16)
 
-// if-goto IF_TRUE3
+// if-goto IF_TRUE_10
 @SP
 AM=M-1
 D=M
 M=0
-@IF_TRUE3
+@IF_TRUE_10
 D;JNE
 
-// goto IF_FALSE3
-@IF_FALSE3
+// goto IF_FALSE_10
+@IF_FALSE_10
 0;JMP
 
-// label IF_TRUE3
-(IF_TRUE3)
+// label IF_TRUE_10
+(IF_TRUE_10)
 
 // push constant 1
 @1
@@ -6619,8 +6619,8 @@ M=0
 A=M
 M=D
 
-// label IF_FALSE3
-(IF_FALSE3)
+// label IF_FALSE_10
+(IF_FALSE_10)
 
 // push local 0
 @0
@@ -6667,20 +6667,20 @@ M=0
 0;JMP
 (continue_17)
 
-// if-goto IF_TRUE4
+// if-goto IF_TRUE_11
 @SP
 AM=M-1
 D=M
 M=0
-@IF_TRUE4
+@IF_TRUE_11
 D;JNE
 
-// goto IF_FALSE4
-@IF_FALSE4
+// goto IF_FALSE_11
+@IF_FALSE_11
 0;JMP
 
-// label IF_TRUE4
-(IF_TRUE4)
+// label IF_TRUE_11
+(IF_TRUE_11)
 
 // push constant 2
 @2
@@ -6705,8 +6705,8 @@ M=0
 A=M
 M=D
 
-// label IF_FALSE4
-(IF_FALSE4)
+// label IF_FALSE_11
+(IF_FALSE_11)
 
 // push local 0
 @0
@@ -6753,20 +6753,20 @@ M=0
 0;JMP
 (continue_18)
 
-// if-goto IF_TRUE5
+// if-goto IF_TRUE_12
 @SP
 AM=M-1
 D=M
 M=0
-@IF_TRUE5
+@IF_TRUE_12
 D;JNE
 
-// goto IF_FALSE5
-@IF_FALSE5
+// goto IF_FALSE_12
+@IF_FALSE_12
 0;JMP
 
-// label IF_TRUE5
-(IF_TRUE5)
+// label IF_TRUE_12
+(IF_TRUE_12)
 
 // push constant 3
 @3
@@ -6791,8 +6791,8 @@ M=0
 A=M
 M=D
 
-// label IF_FALSE5
-(IF_FALSE5)
+// label IF_FALSE_12
+(IF_FALSE_12)
 
 // push local 0
 @0
@@ -6839,20 +6839,20 @@ M=0
 0;JMP
 (continue_19)
 
-// if-goto IF_TRUE6
+// if-goto IF_TRUE_13
 @SP
 AM=M-1
 D=M
 M=0
-@IF_TRUE6
+@IF_TRUE_13
 D;JNE
 
-// goto IF_FALSE6
-@IF_FALSE6
+// goto IF_FALSE_13
+@IF_FALSE_13
 0;JMP
 
-// label IF_TRUE6
-(IF_TRUE6)
+// label IF_TRUE_13
+(IF_TRUE_13)
 
 // push constant 4
 @4
@@ -6877,11 +6877,11 @@ M=0
 A=M
 M=D
 
-// label IF_FALSE6
-(IF_FALSE6)
+// label IF_FALSE_13
+(IF_FALSE_13)
 
-// label WHILE_EXP2
-(WHILE_EXP2)
+// label WHILE_14
+(WHILE_14)
 
 // push local 0
 @0
@@ -6938,12 +6938,12 @@ M=!M
 A=M-1
 M=!M
 
-// if-goto WHILE_END2
+// if-goto WHILE_CONTINUE_14
 @SP
 AM=M-1
 D=M
 M=0
-@WHILE_END2
+@WHILE_CONTINUE_14
 D;JNE
 
 // call Keyboard.keyPressed 0
@@ -7077,19 +7077,19 @@ M=0
 @5
 M=D
 
-// goto WHILE_EXP2
-@WHILE_EXP2
+// goto WHILE_14
+@WHILE_14
 0;JMP
 
-// label WHILE_END2
-(WHILE_END2)
+// label WHILE_CONTINUE_14
+(WHILE_CONTINUE_14)
 
-// goto WHILE_EXP0
-@WHILE_EXP0
+// goto WHILE_5
+@WHILE_5
 0;JMP
 
-// label WHILE_END0
-(WHILE_END0)
+// label WHILE_CONTINUE_5
+(WHILE_CONTINUE_5)
 
 // push constant 0
 @0
