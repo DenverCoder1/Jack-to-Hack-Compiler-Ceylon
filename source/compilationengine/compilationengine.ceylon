@@ -83,8 +83,6 @@ shared class CompilationEngine {
 		compilation += " ".repeat(indentLevel);
 		compilation += str;
 		compilation += "\n";
-		// print token for debugging
-		// vmWriter.writeArithmetic("// "+str);
 	}
 	
 	// add token to output
